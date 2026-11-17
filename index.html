@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prospección con IA</title>
+<title>Prospecciona</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -600,8 +600,8 @@ ol.glist{list-style:decimal}
     </div>
     <div class="top-grid">
       <div class="intro">
-        <h1>Prospección con IA</h1>
-        <p class="sub">Investiga mejor. Personaliza tu mensaje. Prepara tu próxima conversación.</p>
+        <h1>Prospecciona</h1>
+        <p class="sub">De la empresa a la reunión, paso a paso.</p>
         <p class="desc">Un recorrido guiado de 10 pasos y una biblioteca de <span id="total">20</span> prompts para pasar de una empresa interesante a una reunión comercial. Completa los datos, copia el prompt en tu asistente de IA y guarda aquí la respuesta: los pasos siguientes la aprovechan.</p>
       </div>
       <div class="notices">
@@ -3948,7 +3948,7 @@ $("#bkCopy").addEventListener("click",e=>copyText(exportText(),e.currentTarget,"
 $("#bkDownload").addEventListener("click",()=>{
   try{
     const url=URL.createObjectURL(new Blob([exportText()],{type:"application/json"})),a=document.createElement("a");
-    a.href=url;a.download=`prospeccion-ia-copia-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();
+    a.href=url;a.download=`prospecciona-copia-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),4000);
     toast("Descargando la copia. Si no aparece, usa «Copiar como texto».");
   }catch(e){toast("No se pudo descargar. Usa «Copiar como texto».")}
