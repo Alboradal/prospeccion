@@ -583,6 +583,9 @@ ol.glist{list-style:decimal}
 .btn.paste{align-self:flex-start;margin:4px 0}
 .bk-remind{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:14px;padding:14px 16px;border-radius:12px;border:1px solid color-mix(in srgb,var(--cat-bon) 45%,transparent);background:color-mix(in srgb,var(--cat-bon) 10%,var(--surface))}
 .bk-remind p{flex:1 1 320px}
+.tplbox{padding:16px;border-radius:12px;border:1px dashed var(--accent);background:var(--accent-soft);display:flex;flex-direction:column;gap:10px}
+.tplbox h4{font-size:1rem;font-weight:700}
+.tplbox .sel{flex:1 1 260px;max-width:420px}
 </style>
 </head>
 <body>
@@ -2338,6 +2341,7 @@ card.addEventListener("click",e=>{
   }
   else if(act==="newp")openPDialog(null,b);
   else if(act==="help")openGuideStep(n);
+  else if(act==="tpl")applyTpl(b);
   else if(act==="paste")pasteInto($("#resText"));
   else if(act==="showall"){store.ui.simple=false;save();applySimple();toast("Modo completo: ves todos los campos")}
   else if(act==="newint")openInt(activeP().id,b);
@@ -2986,6 +2990,107 @@ function renderTools(){
 $("#toolGrid").addEventListener("click",e=>{const b=e.target.closest("[data-tool]");if(b)TOOLS[+b.dataset.tool][3](b)});
 initTagFilters();renderTools();
 
+/* ================= Plantillas de sector (paso 1) ================= */
+const PLANTILLAS=[
+{id:"servicios",name:"Asesoría, gestoría y consultoría",b:{sector:"Servicios profesionales",producto:"Asesoramiento fiscal, contable y laboral para empresas",
+  descripcion:"Despacho que lleva la contabilidad, los impuestos y las nóminas de pequeñas y medianas empresas, con un asesor asignado a cada cliente.",
+  problema:"Errores y retrasos en impuestos y nóminas, sanciones evitables y poco tiempo del gerente para dirigir el negocio.",
+  propuesta:"Nos ocupamos de impuestos, contabilidad y nóminas para que dediques tu tiempo a tu negocio sin sustos con Hacienda.",
+  ventajas:"Asesor fijo que conoce la empresa; respuesta en el día; informes mensuales claros.",diferenciacion:"Trato cercano frente a las grandes asesorías y más experiencia que un autónomo que trabaja solo.",
+  beneficios:"Menos sanciones y recargos, ahorro fiscal legal y horas de gestión que el gerente recupera.",
+  clienteIdeal:"Pymes de 5 a 50 personas cuyo gerente lleva hoy parte de la gestión o no está contento con su asesoría actual.",
+  objetivo:"Conseguir 4 reuniones al mes con gerentes de pymes.",tono:"Profesional y cercano"},
+ icp:{sector:"Comercio, hostelería, construcción y servicios",tamano:"Pequeña (10–49)",necesidades:"Cumplir plazos fiscales sin errores; controlar costes laborales; entender sus números.",
+  prioritarias:"Empresas que crecen en plantilla o que acaban de cambiar de gerente.",descartar:"Grandes empresas con departamento financiero propio."}},
+{id:"software",name:"Software y tecnología para empresas",b:{sector:"Tecnología",producto:"Programa en la nube que automatiza procesos de gestión",
+  descripcion:"Aplicación que sustituye hojas de cálculo y tareas manuales por un proceso automático, con implantación y soporte en español.",
+  problema:"Trabajo repetitivo en hojas de cálculo, errores al copiar datos y falta de información actualizada para decidir.",
+  propuesta:"Automatizamos el proceso que hoy hacéis a mano para que ahorréis horas cada semana y tengáis los datos al día.",
+  ventajas:"Puesta en marcha en pocas semanas; se conecta con los programas que ya usáis; soporte en español.",diferenciacion:"Más fácil de implantar que las soluciones grandes y más completo que las herramientas genéricas.",
+  beneficios:"Horas de trabajo manual ahorradas, menos errores y decisiones con datos actualizados.",
+  clienteIdeal:"Empresas de 20 a 250 personas que gestionan este proceso con hojas de cálculo y tienen a alguien responsable de mejorarlo.",
+  objetivo:"Conseguir demostraciones con responsables de área.",tono:"Directo"},
+ icp:{sector:"Distribución, servicios y fabricación",tamano:"Mediana (50–249)",necesidades:"Ahorrar tiempo en tareas repetitivas; tener información fiable; crecer sin contratar más personal administrativo.",
+  prioritarias:"Empresas que están contratando para el área o que han anunciado crecimiento.",descartar:"Empresas muy pequeñas sin el problema o grandes grupos con desarrollo propio."}},
+{id:"industria",name:"Industria y suministros industriales",b:{sector:"Industria",producto:"Suministro de componentes y consumibles industriales",
+  descripcion:"Proveedor de componentes para fábricas, con almacén propio y asesoramiento técnico para elegir la pieza adecuada.",
+  problema:"Paradas de producción por falta de piezas, plazos de entrega largos y proveedores que no ayudan a elegir.",
+  propuesta:"Te aseguramos las piezas que necesitas a tiempo para que tu línea de producción no se pare.",
+  ventajas:"Stock disponible y entrega rápida; técnicos que asesoran; servicio de reposición programada.",diferenciacion:"Más rapidez y asesoramiento que los grandes distribuidores en línea.",
+  beneficios:"Menos horas de producción perdidas, menos stock inmovilizado y compras más sencillas.",
+  clienteIdeal:"Fábricas de 30 a 300 personas con producción continua y un responsable de compras o de mantenimiento.",
+  objetivo:"Ser proveedor homologado de nuevas fábricas de la zona.",tono:"Directo"},
+ icp:{sector:"Alimentación, metal, plástico y madera",tamano:"Mediana (50–249)",necesidades:"Evitar paradas; reducir stock; tener un proveedor fiable de recambios.",
+  prioritarias:"Fábricas que amplían instalaciones o abren nuevas líneas.",descartar:"Talleres muy pequeños o grupos que compran solo con contratos centralizados."}},
+{id:"marketing",name:"Marketing, diseño y comunicación",b:{sector:"Marketing y comunicación",producto:"Servicios de marketing digital para captar clientes",
+  descripcion:"Agencia que diseña y gestiona campañas, web y redes sociales con objetivos medibles.",
+  problema:"Webs y redes que no generan clientes, inversión en publicidad sin saber qué funciona y falta de tiempo para hacerlo bien.",
+  propuesta:"Convertimos tu web y tus redes en una fuente constante de contactos de clientes, con resultados que puedes medir.",
+  ventajas:"Equipo propio de diseño, contenido y publicidad; informes mensuales sencillos.",diferenciacion:"Nos centramos en conseguir contactos de clientes y no solo en publicar contenido.",
+  beneficios:"Más solicitudes de presupuesto y menos dinero perdido en publicidad que no funciona.",
+  clienteIdeal:"Empresas de servicios de 5 a 100 personas que quieren más clientes y no tienen equipo de marketing.",
+  objetivo:"Conseguir auditorías gratuitas de marketing con gerentes.",tono:"Profesional y cercano"},
+ icp:{sector:"Servicios profesionales, salud privada, educación y turismo",tamano:"Pequeña (10–49)",necesidades:"Conseguir más clientes; mejorar su imagen; medir lo que funciona.",
+  prioritarias:"Empresas que lanzan un servicio nuevo o tienen una web anticuada.",descartar:"Empresas con agencia contratada hace poco o sin presupuesto de marketing."}},
+{id:"formacion",name:"Formación y desarrollo de personas",b:{sector:"Formación",producto:"Formación a medida para equipos de empresa",
+  descripcion:"Cursos y talleres prácticos diseñados para cada empresa, presenciales o en línea, con posibilidad de bonificación.",
+  problema:"Equipos que no tienen las habilidades que el negocio necesita y formaciones genéricas que no se aplican al trabajo.",
+  propuesta:"Diseñamos formación práctica para tu equipo, aplicada a vuestro día a día, y te ayudamos a bonificarla.",
+  ventajas:"Programas a medida; formadores con experiencia en empresa; gestión de la bonificación.",diferenciacion:"Formación aplicada al puesto, frente a los cursos genéricos de catálogo.",
+  beneficios:"Equipos más productivos, menos rotación y formación que puede salir bonificada.",
+  clienteIdeal:"Empresas de 20 a 250 personas con responsable de personas o de formación.",
+  objetivo:"Conseguir reuniones con responsables de recursos humanos.",tono:"Consultivo"},
+ icp:{sector:"Servicios, industria y comercio",tamano:"Mediana (50–249)",necesidades:"Mejorar habilidades del equipo; retener talento; aprovechar el crédito de formación.",
+  prioritarias:"Empresas que están creciendo o cambiando de herramientas o procesos.",descartar:"Empresas sin plantilla estable."}},
+{id:"mantenimiento",name:"Mantenimiento e instalaciones técnicas",b:{sector:"Instalaciones y mantenimiento",producto:"Mantenimiento preventivo de instalaciones",
+  descripcion:"Empresa con técnicos propios que revisa y repara instalaciones de climatización, electricidad o protección contra incendios.",
+  problema:"Averías que paran la actividad, reparaciones urgentes caras y revisiones obligatorias olvidadas.",
+  propuesta:"Revisamos tus instalaciones antes de que fallen para que tu actividad no se pare por una avería.",
+  ventajas:"Técnicos propios; respuesta rápida; informe del estado de cada equipo.",diferenciacion:"Prevención planificada frente a llamar solo cuando algo se rompe.",
+  beneficios:"Menos reparaciones urgentes, menos horas perdidas y revisiones legales al día.",
+  clienteIdeal:"Naves, oficinas y comercios de más de 1.000 m² con un responsable de mantenimiento o de instalaciones.",
+  objetivo:"Conseguir visitas de diagnóstico a instalaciones.",tono:"Directo"},
+ icp:{sector:"Logística, fabricación, comercio y oficinas",tamano:"Mediana (50–249)",necesidades:"Evitar paradas; cumplir revisiones obligatorias; controlar el gasto de mantenimiento.",
+  prioritarias:"Empresas que amplían instalaciones o han tenido averías recientes.",descartar:"Locales pequeños sin instalaciones propias."}},
+{id:"logistica",name:"Logística y transporte",b:{sector:"Logística",producto:"Transporte y almacenaje para empresas",
+  descripcion:"Operador que almacena, prepara pedidos y transporta mercancía con seguimiento en tiempo real.",
+  problema:"Entregas con retraso, costes de transporte que suben y falta de espacio en el almacén.",
+  propuesta:"Nos encargamos de almacenar y entregar tus pedidos a tiempo, con un coste que puedes prever.",
+  ventajas:"Flota y almacén propios; seguimiento de cada envío; tarifas cerradas.",diferenciacion:"Atención directa y flexibilidad frente a los grandes operadores.",
+  beneficios:"Menos incidencias con clientes, costes previsibles y espacio liberado.",
+  clienteIdeal:"Fabricantes y distribuidores que envían a diario a tiendas o empresas de la región.",
+  objetivo:"Conseguir pruebas piloto con nuevos clientes.",tono:"Directo"},
+ icp:{sector:"Alimentación, distribución y comercio electrónico",tamano:"Mediana (50–249)",necesidades:"Entregar a tiempo; ajustar costes; crecer sin ampliar almacén propio.",
+  prioritarias:"Empresas que abren nuevos mercados o venden en línea.",descartar:"Empresas con flota propia suficiente."}},
+{id:"distribucion",name:"Distribución y venta al por mayor",b:{sector:"Distribución",producto:"Distribución de productos a tiendas y negocios",
+  descripcion:"Mayorista con catálogo amplio, pedido mínimo bajo y reparto propio.",
+  problema:"Proveedores con pedidos mínimos altos, roturas de stock y repartos poco fiables.",
+  propuesta:"Te servimos lo que necesitas, cuando lo necesitas y sin pedidos mínimos imposibles.",
+  ventajas:"Catálogo amplio; reparto propio; atención por un comercial asignado.",diferenciacion:"Más flexibilidad que los grandes mayoristas y más surtido que los pequeños.",
+  beneficios:"Menos dinero inmovilizado en stock, menos roturas y compras más rápidas.",
+  clienteIdeal:"Tiendas, hostelería y negocios de la zona que compran a varios proveedores.",
+  objetivo:"Abrir nuevos puntos de venta cada mes.",tono:"Profesional y cercano"},
+ icp:{sector:"Hostelería, comercio minorista y alimentación",tamano:"Microempresa (1–9 empleados)",necesidades:"Comprar sin inmovilizar dinero; recibir a tiempo; simplificar proveedores.",
+  prioritarias:"Negocios que abren o cambian de dueño.",descartar:"Cadenas con compra centralizada."}}
+];
+function tplBox(){
+  return `<section class="tplbox" aria-labelledby="tplH"><h4 id="tplH">¿Empiezas de cero? Usa una plantilla de tu sector</h4>
+    <p class="muted">Rellena los campos vacíos de este paso y del cliente ideal (paso 2) con un ejemplo de tu sector. Los campos que ya tengas escritos no se tocan. Después, revisa y adapta cada texto a tu caso.</p>
+    <div class="row-btns"><label class="sr" for="tplSel">Sector</label><select class="sel" id="tplSel"><option value="">Elige tu sector</option>${PLANTILLAS.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("")}</select>
+    <button type="button" class="btn primary" data-act="tpl">Aplicar plantilla</button></div></section>`;
+}
+function applyTpl(btn){
+  const t=PLANTILLAS.find(x=>x.id===$("#tplSel").value);
+  if(!t){toast("Elige primero tu sector");$("#tplSel").focus();return}
+  let n=0;
+  for(const[k,v]of Object.entries(t.b))if(!(store.business[k]||"").trim()){store.business[k]=v;n++}
+  for(const[k,v]of Object.entries(t.icp))if(!(store.icp[k]||"").trim()){store.icp[k]=v;n++}
+  touch(1);save();renderStep(false);
+  toast(n?`Plantilla aplicada en ${n} campos vacíos. Revísalos y adáptalos a tu caso.`:"Todos esos campos ya estaban rellenos: no se ha cambiado nada");
+  const f=$("#x-business-producto");if(f)f.focus();
+}
+STEPS[0].before=()=>tplBox();
+
 const ROUTES=[
   {name:"Primer email",desc:"De la investigación a un email revisado",ids:[1,2,3,4,5,20]},
   {name:"Llamada en frío",desc:"Del perfil al guion y al registro",ids:[1,2,4,8,10,18]},
@@ -3521,6 +3626,7 @@ const FAQ=[
   ["¿Puedo usarla en el móvil y en el ordenador a la vez?","Sí, pero cada uno guarda sus propios datos: no se sincronizan. Para pasar tus datos, descarga una copia de seguridad en uno y recupérala en el otro.","backup"],
   ["¿Puedo perder mis datos?","Sí, si borras los datos de navegación, usas el modo incógnito o cambias de navegador. Descarga una copia de seguridad de vez en cuando.","backup"],
   ["¿Qué hago si la IA se inventa algo?","Comprueba siempre los datos antes de usarlos. Los prompts piden a la IA que marque qué es un hecho, qué es una hipótesis y qué no sabe, pero puede equivocarse igualmente. Nunca envíes a un cliente algo que no hayas verificado.",""],
+  ["¿Qué son las plantillas de sector?","En el paso 1 puedes elegir tu sector y la plataforma rellena los campos vacíos de tu negocio y de tu cliente ideal con un ejemplo. Es un punto de partida: revisa cada texto y cámbialo para que hable de tu empresa.","s1"],
   ["¿Tengo que rellenar todos los campos?","No. Rellena lo que sepas. Si falta algo importante, la plataforma te avisa y el prompt pide a la IA que no lo suponga.",""],
   ["¿Tengo que seguir los pasos en orden?","Es lo recomendable, porque cada paso aprovecha lo anterior, pero puedes saltar a cualquiera. Si dudas, pulsa «¿Qué tengo que hacer ahora?» en Mi sistema.","sistema"],
   ["¿Cómo trabajo con varios prospectos a la vez?","Cada empresa tiene su ficha. Elige la empresa activa en el selector de arriba y todo, el recorrido y los prompts, se adapta a él.","prospectos"],
@@ -3548,7 +3654,7 @@ function guideHTML(){
 
   <section class="panel gsec" id="g-empieza" aria-labelledby="g-empieza-h"><h3 id="g-empieza-h">Empieza en 5 minutos</h3>
     <ol class="gsteps">
-      <li><div><strong>Cuéntanos tu negocio.</strong> Rellena al menos qué vendes, qué problema resuelves y a quién. Solo se hace una vez.</div>${goBtn("s1")}</li>
+      <li><div><strong>Cuéntanos tu negocio.</strong> Rellena al menos qué vendes, qué problema resuelves y a quién, o empieza con una plantilla de tu sector. Solo se hace una vez.</div>${goBtn("s1")}</li>
       <li><div><strong>Apunta 2 o 3 empresas.</strong> Las que crees que podrían necesitarte. Cada una tendrá su ficha.</div>${goBtn("s2")}</li>
       <li><div><strong>Investiga una.</strong> Pulsa «Generar instrucciones para IA», copia el texto en tu asistente y pega aquí su respuesta.</div>${goBtn("s3")}</li>
       <li><div><strong>Déjate guiar.</strong> Cuando no sepas qué hacer, pulsa «¿Qué tengo que hacer ahora?» en Mi sistema.</div>${goBtn("sistema")}</li>
