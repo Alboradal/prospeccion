@@ -165,7 +165,6 @@ button{cursor:pointer}
 
 /* Barra de herramientas */
 .tools{background:var(--bg);padding:12px 0;border-bottom:1px solid var(--line);z-index:5;transition:background .3s}
-@media (min-width:720px) and (min-height:560px){.tools{position:sticky;top:0}}
 .tools-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .search{position:relative;flex:1 1 260px}
 .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
@@ -303,10 +302,161 @@ dialog[open]{animation:open .26s cubic-bezier(.2,.8,.2,1)}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
+
+/* ===== Fase 1: navegación, sistema y fichas ===== */
+.skip{position:absolute;left:-999px;top:8px;z-index:60;background:var(--surface);padding:10px 14px;border-radius:10px;font-weight:600}
+.skip:focus{left:16px}
+.top{padding:18px 0 22px}
+.top h1{font-size:clamp(2.5rem,6vw,4rem)}
+.top-grid{align-items:end}
+.notices{font-size:.86rem;color:var(--muted);display:flex;flex-direction:column;gap:4px;max-width:52ch}
+.notices .warn{color:var(--danger);font-weight:600}
+.muted{color:var(--muted)}
+.appnav{background:var(--bg);border-bottom:1px solid var(--line);z-index:6;transition:background .3s}
+@media (min-width:900px) and (min-height:600px){.appnav{position:sticky;top:0}}
+.appnav-row{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;justify-content:space-between;padding-top:8px;padding-bottom:8px}
+.tabs{display:flex;gap:4px;overflow-x:auto;max-width:100%}
+.tab{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 14px;border-radius:10px;color:var(--muted);font-weight:600;text-decoration:none;transition:background .15s,color .15s,box-shadow .15s}
+.tab b{font-size:.78rem;padding:1px 7px;border-radius:99px;background:var(--accent-soft);color:var(--accent-strong);font-variant-numeric:tabular-nums}
+.tab:hover{color:var(--ink);background:var(--surface)}
+.tab[aria-current="page"]{color:var(--ink);background:var(--surface);box-shadow:inset 0 -3px 0 var(--accent)}
+.active-p{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.active-p label{font-size:.88rem;color:var(--muted);font-weight:600}
+.sel{min-height:44px;padding:8px 12px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);max-width:100%}
+#selProspect{width:min(300px,100%)}
+.view{padding:24px 0 40px;animation:fade .25s ease}
+.view>.wrap>.panel:first-child{margin-top:0}
+.sys-head{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+.sys-head h2{font-family:var(--f-display);font-weight:400;font-size:clamp(1.9rem,4vw,2.6rem)}
+.sys-head p{max-width:64ch;margin-top:4px}
+.whatnow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:14px 16px;border-radius:12px;background:var(--accent-soft);border:1px solid var(--line-strong);margin-bottom:16px;animation:rise .3s ease both}
+.whatnow p{flex:1 1 320px}
+.progress{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-bottom:12px;font-size:.93rem;color:var(--muted)}
+.progress .bar{max-width:320px}
+.stepper-wrap{display:grid;gap:12px;margin-bottom:18px}
+@media (min-width:1000px){.stepper-wrap{grid-template-columns:auto minmax(0,1fr)}}
+.sg{font-size:.84rem;font-weight:700;color:var(--muted);margin-bottom:6px;overflow-wrap:anywhere}
+.stepper{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:thin;list-style:none}
+.st{flex:none;display:flex;align-items:center;gap:8px;min-height:46px;padding:5px 12px 5px 5px;border:1px solid var(--line-strong);border-radius:999px;background:var(--surface);font-weight:600;font-size:.9rem;transition:border-color .15s,background .15s,box-shadow .15s}
+.st:hover{border-color:var(--accent)}
+.st .dot{width:32px;height:32px;font-size:.85rem}
+.st.is-done .dot{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.st.is-progress .dot{border-color:var(--accent);border-style:dashed;color:var(--accent-strong)}
+.st[aria-current="step"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.st .lbl{white-space:nowrap}
+@media (max-width:1240px){.st .lbl{display:none}.st{padding-right:5px}.st[aria-current="step"] .lbl{display:inline}.st[aria-current="step"]{padding-right:12px}}
+.stepcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.sc-head{padding:20px 22px 16px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:flex-start}
+.sc-num{font-family:var(--f-display);font-style:italic;font-size:3.2rem;line-height:.85;color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
+.sc-t{display:flex;flex-direction:column;gap:6px;min-width:0}
+.sc-t .meta{display:flex;flex-wrap:wrap;gap:8px}
+.sc-head h3{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,3.4vw,2.2rem)}
+.sc-head h3:focus{outline:none}
+.sc-head p{color:var(--muted);max-width:68ch}
+.state{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:.8rem;font-weight:700;border:1px solid var(--line-strong);color:var(--muted)}
+.state.is-done{background:var(--ok-soft);color:var(--ok-ink);border-color:transparent}
+.state.is-progress{background:var(--accent-soft);color:var(--accent-strong);border-color:transparent}
+.sc-body{padding:18px 22px 22px;display:flex;flex-direction:column;gap:22px}
+.help{border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+.help summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:.95rem;min-height:44px;display:flex;align-items:center}
+.help ol{list-style:decimal;padding:0 18px 12px 34px;display:grid;gap:6px;color:var(--muted);font-size:.95rem}
+.fgroup{border:0;margin:0;padding:0;min-width:0}
+.fgroup legend,.sub h4,.promptbox h4,.h3s{font-size:1rem;font-weight:700;padding:0;margin:0 0 10px}
+.fgrid{display:grid;gap:12px 16px;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr))}
+.fgrid .wide{grid-column:1/-1}
+.field small{color:var(--muted);font-size:.84rem}
+.field input[type="number"]{max-width:140px}
+.checks{border:0;margin:0;padding:0;min-width:0}
+.checks legend{font-weight:600;font-size:.95rem;margin-bottom:6px;padding:0}
+.checks .opts2{display:flex;flex-wrap:wrap;gap:8px}
+.check{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:6px 12px;border:1px solid var(--line-strong);border-radius:10px;font-size:.93rem;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s}
+.check input{width:18px;height:18px;accent-color:var(--accent);margin:0}
+.check:has(input:checked){background:var(--accent-soft);border-color:var(--accent)}
+.variants{display:flex;flex-direction:column;gap:8px}
+.variants .seg{flex-wrap:wrap;align-self:flex-start;max-width:100%}
+.missing{padding:12px 14px;border-radius:10px;border:1px dashed var(--line-strong);background:var(--surface-2);font-size:.93rem}
+.missing.ok{border-style:solid;border-color:transparent;background:var(--ok-soft);color:var(--ok-ink)}
+.promptbox{border:1px solid var(--line-strong);border-radius:12px;padding:16px;background:var(--surface-2);display:flex;flex-direction:column;gap:12px}
+.promptbox .pv{background:var(--surface);max-height:420px;overflow:auto}
+.pb-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.small-note{font-size:.88rem;color:var(--muted)}
+.resultbox{display:flex;flex-direction:column;gap:10px}
+.resultbox textarea{min-height:190px}
+.sub{border-top:1px solid var(--line);padding-top:18px}
+.sub>p{margin-bottom:12px}
+.sc-foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:14px 22px;border-top:1px solid var(--line)}
+.btn.toggle[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.btn.nudge{animation:nudge .9s ease 2}
+.empty-in{padding:18px;border:1px dashed var(--line-strong);border-radius:12px;display:flex;flex-direction:column;gap:12px}
+.row-btns{display:flex;flex-wrap:wrap;gap:8px}
+.scorecard{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:16px 18px;border-radius:12px;border:1px solid var(--line-strong);background:var(--surface-2)}
+.scorenum{font-family:var(--f-display);font-size:3.4rem;line-height:1;font-variant-numeric:tabular-nums}
+.scorenum small{font-size:1.2rem;color:var(--muted)}
+.scorecard>div:last-child{flex:1 1 260px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.prio{display:inline-flex;padding:3px 10px;border-radius:999px;font-size:.82rem;font-weight:700;background:var(--line);color:var(--ink)}
+.prio[data-p="alta"]{background:var(--ok-soft);color:var(--ok-ink)}
+.prio[data-p="media"]{background:color-mix(in srgb,var(--cat-bon) 18%,transparent);color:var(--cat-bon)}
+.prio[data-p="baja"]{background:color-mix(in srgb,var(--danger) 14%,transparent);color:var(--danger)}
+.addrow{display:grid;gap:10px 12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));align-items:end}
+.tblwrap{overflow-x:auto;margin-top:14px;border:1px solid var(--line);border-radius:10px}
+.tbl{width:100%;border-collapse:collapse;font-size:.94rem}
+.tbl th,.tbl td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:last-child>*{border-bottom:0}
+.tbl thead th{font-size:.84rem;color:var(--muted);background:var(--surface-2)}
+.tbl tbody th small{display:block;font-weight:400;color:var(--muted)}
+[data-eg="ini"]{--eg:var(--accent)}[data-eg="act"]{--eg:var(--cat-lla)}[data-eg="won"]{--eg:var(--ok)}[data-eg="lost"]{--eg:var(--muted)}
+.estado{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:.8rem;font-weight:700;color:var(--eg);border:1px solid var(--eg);background:var(--surface);white-space:nowrap}
+.estado::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--eg)}
+.crm-tools{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:6px}
+.crm-tools .search{flex:1 1 260px}
+.crm-tools .search input{width:100%;min-height:46px;padding:10px 14px 10px 40px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface)}
+.crm-list{display:grid;gap:12px;margin-top:12px}
+.pcard{display:grid;gap:12px 22px;padding:16px 18px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--eg);border-radius:6px 14px 14px 6px;animation:rise .25s ease both;transition:box-shadow .2s}
+.pcard:hover,.pcard:focus-within{box-shadow:var(--shadow)}
+@media (min-width:900px){.pcard{grid-template-columns:minmax(0,1.6fr) minmax(0,1.3fr) auto;align-items:center}}
+.pcard h3{font-family:var(--f-display);font-weight:400;font-size:1.6rem;line-height:1.1;overflow-wrap:anywhere}
+.pcard .who{color:var(--muted);font-size:.95rem;overflow-wrap:anywhere}
+.pc-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.9rem;color:var(--muted)}
+.pc-meta .mini{display:inline-flex;align-items:center;gap:8px}
+.pc-meta .bar{width:80px;flex:none}
+.pc-next{font-size:.9rem;color:var(--muted);flex-basis:100%}
+.pcard .card-actions{margin:0;justify-content:flex-end}
+.is-activep{font-size:.78rem;font-weight:700;color:var(--accent-strong);background:var(--accent-soft);padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:middle;font-family:var(--f-body)}
+.wide{width:min(900px,calc(100% - 32px))}
+.card-head{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-start;justify-content:space-between}
+.card-head h2{overflow-wrap:anywhere}
+.dl{display:grid;grid-template-columns:minmax(120px,max-content) 1fr;gap:6px 14px;font-size:.94rem;margin:0}
+.dl dt{color:var(--muted)}
+.dl dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+@media (max-width:520px){.dl{grid-template-columns:1fr}.dl dd{margin-bottom:6px}}
+.card-sec{border-top:1px solid var(--line);padding-top:14px}
+.card-sec>h3{font-size:1rem;font-weight:700;margin-bottom:10px}
+.res-item{border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+.res-item summary{cursor:pointer;padding:10px 12px;font-weight:600;min-height:44px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+.res-item summary small{color:var(--muted);font-weight:400}
+.res-item .pv{margin:0 12px 12px;max-height:320px;overflow:auto}
+.res-item .pb-actions{padding:0 12px 12px}
+.pf2{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))}
+.row.start{justify-content:flex-start}
+.row.start .link{margin-right:0}
+@media (max-width:640px){
+  .sc-head{padding:16px 14px 12px;gap:10px}
+  .sc-num{font-size:2.4rem}
+  .sc-body{padding:16px 14px 18px}
+  .sc-foot{padding:12px 14px}
+  .sc-foot .btn{flex:1 1 140px}
+  .active-p{width:100%}
+  .active-p .sel{flex:1 1 160px}
+}
+.stepper-wrap>div{min-width:0}
+@media (max-width:440px){.tab{padding:8px 9px;gap:6px}.tabs{gap:0}}
+#selProspect{width:250px}
+@media (min-width:900px){.active-p{flex-wrap:nowrap}}
+@media (max-width:1360px){.st .lbl{display:none}.st{padding-right:5px}.st[aria-current="step"] .lbl{display:inline}.st[aria-current="step"]{padding-right:12px}}
 </style>
 </head>
 <body>
-
+<a class="skip" href="#main">Saltar al contenido</a>
 <header class="top">
   <div class="wrap">
     <div class="top-bar">
@@ -318,28 +468,91 @@ dialog[open]{animation:open .26s cubic-bezier(.2,.8,.2,1)}
       <div class="intro">
         <h1>Prospección con IA</h1>
         <p class="sub">Investiga mejor. Personaliza tu mensaje. Prepara tu próxima conversación.</p>
-        <p class="desc">Una biblioteca práctica de <span id="total">20</span> prompts para investigar prospectos, redactar emails, preparar llamadas y dar seguimiento. Elige un prompt, completa los datos y cópialo para utilizarlo en tu asistente de IA.</p>
+        <p class="desc">Un recorrido guiado de 10 pasos y una biblioteca de <span id="total">20</span> prompts para pasar de una empresa interesante a una reunión comercial. Completa los datos, copia el prompt en tu asistente de IA y guarda aquí la respuesta: los pasos siguientes la aprovechan.</p>
       </div>
-      <div class="desk">
-        <div class="ctx">
-          <button class="ctx-card" id="btnProspect" type="button"><small>Prospecto actual</small><strong id="ctxProspect">Sin definir</strong><em>Editar ficha</em></button>
-          <button class="ctx-card" id="btnProfile" type="button"><small>Mi perfil de trabajo</small><strong id="ctxProfile">Sin rellenar</strong><em>Editar perfil</em></button>
-        </div>
-        <div class="notices">
-          <p>Este panel prepara y copia instrucciones. No ejecuta los prompts ni consulta LinkedIn o un CRM.</p>
-          <p>Los datos que guardes en el panel se conservan en este navegador. Evita introducir información confidencial.</p>
-          <p id="storageNote" hidden>Este navegador no permite guardar datos ahora mismo: tus cambios se perderán al cerrar la página.</p>
-        </div>
+      <div class="notices">
+        <p>Este panel prepara y copia instrucciones. No ejecuta los prompts ni consulta LinkedIn o un CRM.</p>
+        <p>Los datos que guardes en el panel se conservan en este navegador. Evita introducir información confidencial.</p>
+        <p>No se sincronizan entre dispositivos: usa la copia de seguridad para llevarlos a otro navegador.</p>
+        <p id="storageNote" class="warn" role="alert" hidden></p>
       </div>
     </div>
   </div>
 </header>
 
+<nav class="appnav" aria-label="Secciones">
+  <div class="wrap appnav-row">
+    <div class="tabs">
+      <a class="tab" href="#sistema" data-view="sistema">Mi sistema</a>
+      <a class="tab" href="#prospectos" data-view="prospectos">Prospectos <b id="nProspects">0</b></a>
+      <a class="tab" href="#biblioteca" data-view="biblioteca">Biblioteca <b id="nPrompts">20</b></a>
+    </div>
+    <div class="active-p">
+      <label for="selProspect">Prospecto activo</label>
+      <select class="sel" id="selProspect"></select>
+      <button class="btn" id="btnNewP" type="button">Nuevo prospecto</button>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+  <section class="view" id="view-sistema" aria-labelledby="sysH">
+    <div class="wrap">
+      <div class="sys-head">
+        <div>
+          <h2 id="sysH">Mi sistema de prospección</h2>
+          <p class="muted">De la definición de tu negocio a la reunión. Lo que escribes y las respuestas que guardas se reutilizan en los pasos siguientes. Puedes avanzar aunque falte información.</p>
+        </div>
+        <button class="btn primary" id="btnWhatNow" type="button">¿Qué tengo que hacer ahora?</button>
+      </div>
+      <div class="whatnow" id="whatNow" role="status" aria-live="polite" hidden></div>
+      <div class="progress"><span id="sysProgressTxt"></span><span class="bar" aria-hidden="true"><i id="sysProgressBar"></i></span></div>
+      <div class="stepper-wrap" id="stepper"></div>
+      <article class="stepcard" id="stepCard"></article>
+    </div>
+  </section>
+
+  <section class="view" id="view-prospectos" aria-labelledby="crmH" hidden>
+    <div class="wrap">
+      <div class="sys-head">
+        <div>
+          <h2 id="crmH">Fichas de prospectos</h2>
+          <p class="muted">Datos, investigación, puntuación, estrategia y estado de cada prospecto. Elige uno para seguir trabajando con él en Mi sistema.</p>
+        </div>
+        <button class="btn primary" id="btnNewP2" type="button">Nuevo prospecto</button>
+      </div>
+      <div class="crm-tools">
+        <div class="search">
+          <label class="sr" for="crmQ">Buscar prospectos por empresa, contacto, cargo o notas</label>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg>
+          <input id="crmQ" type="search" placeholder="Buscar empresa, contacto, cargo o notas" autocomplete="off">
+        </div>
+        <label class="sr" for="crmEstado">Filtrar por estado</label>
+        <select class="sel" id="crmEstado"></select>
+        <label class="sr" for="crmSort">Ordenar</label>
+        <select class="sel" id="crmSort">
+          <option value="upd">Más recientes</option>
+          <option value="score">Mayor puntuación</option>
+          <option value="az">Empresa, de la A a la Z</option>
+          <option value="estado">Estado</option>
+        </select>
+      </div>
+      <p class="status" id="crmStatus" role="status" aria-live="polite"></p>
+      <ul class="crm-list" id="crmList"></ul>
+      <div class="empty" id="crmEmpty" hidden>
+        <h2 id="crmEmptyTitle"></h2>
+        <p id="crmEmptyText"></p>
+        <button class="btn primary" id="crmEmptyBtn" type="button"></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-biblioteca" aria-label="Biblioteca de prompts" hidden>
 <div class="wrap">
   <section class="panel finder" aria-labelledby="finderH">
     <div class="finder-head">
       <div>
-        <h2 id="finderH">¿Qué necesitas hacer ahora?</h2>
+        <h2 id="finderH">Encuentra el prompt adecuado</h2>
         <p id="finderSub"></p>
       </div>
       <div class="seg" role="group" aria-label="Forma de elegir">
@@ -381,18 +594,20 @@ dialog[open]{animation:open .26s cubic-bezier(.2,.8,.2,1)}
   </div>
 </section>
 
-<main class="wrap">
+<div class="wrap libmain">
   <ul class="grid" id="grid"></ul>
   <div class="empty" id="empty" hidden>
     <h2 id="emptyTitle"></h2>
     <p id="emptyText"></p>
     <button class="btn primary" id="btnClear2" type="button">Limpiar búsqueda y filtros</button>
   </div>
+</div>
+  </section>
 </main>
 
 <footer>
   <div class="wrap foot">
-    <p>Favoritos, fichas, prompts propios y campos rellenados se guardan solo en este navegador. Llévalos a otro con una copia de seguridad o elimínalos cuando quieras.</p>
+    <p>Tu negocio, tus prospectos, favoritos, prompts propios y respuestas guardadas se conservan solo en este navegador. Haz copias de seguridad de vez en cuando.</p>
     <div>
       <button class="btn" id="btnBackup" type="button">Copia de seguridad</button>
       <button class="btn" id="btnWipe" type="button">Borrar datos guardados</button>
@@ -444,32 +659,6 @@ dialog[open]{animation:open .26s cubic-bezier(.2,.8,.2,1)}
   </div>
 </dialog>
 
-<dialog id="dlgProspect" class="small" aria-labelledby="psTitle">
-  <form class="box" id="psForm" novalidate>
-    <h2 id="psTitle">Ficha del prospecto</h2>
-    <p class="hint">Escribe estos datos una vez y se colocan en todos los prompts que los piden. También se actualizan si los escribes dentro de un prompt.</p>
-    <div class="pf"><label for="ps-nombre">Nombre del prospecto</label><input id="ps-nombre" data-k="nombre" type="text" autocomplete="off"></div>
-    <div class="pf"><label for="ps-cargo">Cargo</label><input id="ps-cargo" data-k="cargo" type="text" autocomplete="off"></div>
-    <div class="pf"><label for="ps-empresa">Empresa</label><input id="ps-empresa" data-k="empresa" type="text" autocomplete="off"></div>
-    <div class="pf"><label for="ps-linkedin">URL de su perfil de LinkedIn</label><input id="ps-linkedin" data-k="linkedin" type="url" autocomplete="off"></div>
-    <div class="pf"><label for="ps-web">Web de la empresa</label><input id="ps-web" data-k="web" type="url" autocomplete="off"></div>
-    <div class="row"><button class="link" id="psNew" type="button">Empezar con otro prospecto</button><button class="btn primary" type="submit">Listo</button></div>
-  </form>
-</dialog>
-
-<dialog id="dlgProfile" class="small" aria-labelledby="pfTitle">
-  <form class="box" id="pfForm" novalidate>
-    <h2 id="pfTitle">Mi perfil de trabajo</h2>
-    <p class="hint">Opcional. Estos datos completan los campos equivalentes de cada prompt; después puedes cambiarlos en un prompt concreto. Se guardan automáticamente en este navegador.</p>
-    <div class="pf"><label for="pf-nombre">Mi nombre</label><input id="pf-nombre" data-k="nombre" type="text" autocomplete="name"></div>
-    <div class="pf"><label for="pf-empresa">Mi empresa</label><input id="pf-empresa" data-k="empresa" type="text" autocomplete="organization"></div>
-    <div class="pf"><label for="pf-producto">Producto o servicio</label><input id="pf-producto" data-k="producto" type="text"></div>
-    <div class="pf"><label for="pf-propuesta">Propuesta de valor</label><textarea id="pf-propuesta" data-k="propuesta" rows="3"></textarea></div>
-    <div class="pf"><label for="pf-telefono">Teléfono</label><input id="pf-telefono" data-k="telefono" type="tel" autocomplete="tel"></div>
-    <div class="row"><button class="btn primary" type="submit">Listo</button></div>
-  </form>
-</dialog>
-
 <dialog id="dlgOwn" class="small" aria-labelledby="ownTitle">
   <form class="box" id="ownForm" novalidate>
     <h2 id="ownTitle">Añadir prompt</h2>
@@ -481,18 +670,6 @@ dialog[open]{animation:open .26s cubic-bezier(.2,.8,.2,1)}
     <p class="err" id="ownErr" role="alert" hidden></p>
     <div class="row"><button class="btn" id="ownCancel" type="button">Cancelar</button><button class="btn primary" type="submit">Guardar prompt</button></div>
   </form>
-</dialog>
-
-<dialog id="dlgBackup" class="small" aria-labelledby="bkTitle">
-  <div class="box">
-    <h2 id="bkTitle">Copia de seguridad</h2>
-    <p class="hint">Para llevar tus datos a otro navegador: copia este texto, guárdalo donde quieras y pégalo en el panel del otro navegador.</p>
-    <div class="pf"><label for="bkOut">Tus datos actuales</label><textarea id="bkOut" class="mono" readonly></textarea></div>
-    <div class="row"><button class="btn primary" id="bkCopy" type="button">Copiar copia de seguridad</button></div>
-    <div class="pf"><label for="bkIn">Recuperar una copia: pega aquí el texto</label><textarea id="bkIn" class="mono"></textarea></div>
-    <p class="err" id="bkErr" role="alert" hidden></p>
-    <div class="row"><button class="btn" id="bkClose" type="button">Cerrar</button><button class="btn" id="bkImport" type="button">Recuperar esta copia</button></div>
-  </div>
 </dialog>
 
 <dialog id="dlgWipe" class="small" aria-labelledby="wipeTitle" aria-describedby="wipeText">
@@ -516,6 +693,48 @@ dialog[open]{animation:open .26s cubic-bezier(.2,.8,.2,1)}
       <button class="btn" id="manSelect" type="button">Seleccionar todo</button>
       <button class="btn primary" id="manClose" type="button">Cerrar</button>
     </div>
+  </div>
+</dialog>
+
+
+
+<dialog id="dlgP" class="small" aria-labelledby="dpTitleP">
+  <form class="box" id="pForm" novalidate>
+    <h2 id="dpTitleP">Nuevo prospecto</h2>
+    <p class="hint">Basta con la empresa o el nombre del contacto. El resto lo completarás en los pasos 3 y 4.</p>
+    <div class="pf"><label for="pp-en">Empresa</label><input id="pp-en" data-k="empresa.nombre" type="text" autocomplete="off"></div>
+    <div class="pf"><label for="pp-ew">Web de la empresa</label><input id="pp-ew" data-k="empresa.web" type="url" autocomplete="off" placeholder="https://"></div>
+    <div class="pf2">
+      <div class="pf"><label for="pp-cn">Nombre del contacto</label><input id="pp-cn" data-k="contacto.nombre" type="text" autocomplete="off"></div>
+      <div class="pf"><label for="pp-ca">Apellidos</label><input id="pp-ca" data-k="contacto.apellidos" type="text" autocomplete="off"></div>
+    </div>
+    <div class="pf"><label for="pp-cc">Cargo</label><input id="pp-cc" data-k="contacto.cargo" type="text" autocomplete="off"></div>
+    <div class="pf"><label for="pp-cl">Perfil de LinkedIn</label><input id="pp-cl" data-k="contacto.linkedin" type="url" autocomplete="off" placeholder="https://"></div>
+    <div class="pf2">
+      <div class="pf"><label for="pp-ce">Email profesional</label><input id="pp-ce" data-k="contacto.email" type="email" autocomplete="off"></div>
+      <div class="pf"><label for="pp-ct">Teléfono profesional</label><input id="pp-ct" data-k="contacto.telefono" type="tel" autocomplete="off"></div>
+    </div>
+    <div class="pf"><label for="pp-es">Estado</label><select class="sel" id="pp-es" data-k="estado"></select></div>
+    <p class="err" id="pErr" role="alert" hidden></p>
+    <div class="row"><button class="btn" id="pCancel" type="button">Cancelar</button><button class="btn primary" type="submit" id="pSubmit">Crear prospecto</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlgCard" class="small wide" aria-labelledby="cardTitle">
+  <div class="box" id="cardBox"></div>
+</dialog>
+
+<dialog id="dlgBackup" class="small" aria-labelledby="bkTitle">
+  <div class="box">
+    <h2 id="bkTitle">Copia de seguridad</h2>
+    <p class="hint">Tus datos se guardan solo en este navegador y no se sincronizan con otros dispositivos. Guarda una copia de vez en cuando: te sirve para recuperarlos o para pasarlos a otro navegador.</p>
+    <p class="hint" id="bkSize"></p>
+    <div class="row start"><button class="btn primary" id="bkDownload" type="button">Descargar copia (.json)</button><button class="btn" id="bkCopy" type="button">Copiar como texto</button></div>
+    <h3 class="h3s">Recuperar una copia</h3>
+    <div class="pf"><label for="bkFile">Elegir el archivo de la copia</label><input id="bkFile" type="file" accept=".json,application/json,text/plain"></div>
+    <div class="pf"><label for="bkIn">O pega aquí el texto de la copia</label><textarea id="bkIn" class="mono" rows="5"></textarea></div>
+    <p class="err" id="bkErr" role="alert" hidden></p>
+    <div class="row"><button class="btn" id="bkClose" type="button">Cerrar</button><button class="btn" id="bkImport" type="button">Recuperar esta copia</button></div>
   </div>
 </dialog>
 
@@ -1104,30 +1323,6 @@ const STAGES=[
 ]}
 ];
 const FLOW={1:[[],[11,4,5]],2:[[],[14,4,5]],3:[[],[4,17]],4:[[1,2,3],[5,8]],5:[[4],[7,20,13]],6:[[1,2],[7,20,13]],7:[[5,6],[20]],8:[[1,4],[10,18]],9:[[3,4],[10,18]],10:[[8,9],[13]],11:[[1],[5,8]],12:[[1,2],[17]],13:[[5,6],[16]],14:[[2],[1,17]],15:[[1],[5]],16:[[13],[19]],17:[[14,12],[18]],18:[[17],[3]],19:[[3],[20]],20:[[5,6,7],[13]]};
-const ROUTES=[
-  {name:"Primer email",desc:"De la investigación a un email revisado",ids:[1,2,3,4,5,20]},
-  {name:"Llamada en frío",desc:"Del perfil al guion y al registro",ids:[1,2,4,8,10,18]},
-  {name:"Reunión de descubrimiento",desc:"Llegar preparado y dejar constancia",ids:[14,12,17,18]}
-];
-
-/* Campos: se detectan por corchetes. SRC indica de qué ficha se completan; ROWS, cuáles son de texto largo. */
-const RX=/\[([^\[\]\n]+)\]/g;
-const IGNORE=new Set(); /* marcadores que serían formato de salida y no datos: ninguno en esta biblioteca */
-const SRC={
-  "Mi nombre":["profile","nombre"],"Mi empresa":["profile","empresa"],"Mi producto o servicio":["profile","producto"],
-  "Propuesta de valor":["profile","propuesta"],"Mi teléfono":["profile","telefono"],
-  "Nombre del prospecto":["prospect","nombre"],"Nombre del contacto":["prospect","nombre"],"Cargo":["prospect","cargo"],
-  "Empresa del prospecto":["prospect","empresa"],"Empresa":["prospect","empresa"],"Nombre de la empresa":["prospect","empresa"],
-  "URL de LinkedIn":["prospect","linkedin"],"URL del perfil de LinkedIn":["prospect","linkedin"],"URL de la empresa":["prospect","web"]
-};
-const ROWS={"Propuesta de valor":3,"Notas del CRM":8,"Información, URL o publicaciones del prospecto":5,"Email a editar":7,"Línea a mejorar":3,
-  "Información adicional del prospecto o empresa":5,"Email a recortar":7,"Punto de dolor identificado":3,"Información de LinkedIn o de la empresa":5,
-  "Prioridades del prospecto":3,"Email inicial":7,"Nuevo valor disponible":3,"Personas identificadas y sus cargos":4,"Información de la empresa":5,
-  "Información del perfil o publicación reciente":5,"Mensajes anteriores":7,"Contexto disponible":5,"Notas o transcripción de la llamada":9,
-  "Último punto de la conversación":3,"Motivo de la pausa":3,"Novedad disponible":3,"Mensaje a revisar":8,"Información verificada del prospecto":5};
-const LONG=/email|notas|informaci|contexto|mensaje|texto|transcrip|hilo|descrip|detalle/i;
-const rowsOf=k=>ROWS[k]||(!SRC[k]&&LONG.test(k)?5:0);
-
 /* ================= Utilidades ================= */
 const $=(s,r=document)=>r.querySelector(s);
 const $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -1136,53 +1331,991 @@ const norm=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
 const pad=n=>String(n).padStart(2,"0");
 const has=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
 const root=document.documentElement;
-
-/* ================= Estado y guardado ================= */
-const KEY="prospeccion-ia:v1";
 const hostTheme=root.dataset.theme||null;
-let storageOK=true;
-function blank(){return {favs:[],profile:{},prospect:{},custom:{},own:[],used:{},theme:null,route:null}}
-function sanitize(o){
-  o=o&&typeof o==="object"?o:{};
-  const obj=v=>v&&typeof v==="object"&&!Array.isArray(v)?v:{};
-  const str=(v,n)=>typeof v==="string"?v.slice(0,n):"";
-  const flat=v=>{const r={};for(const[k,x]of Object.entries(obj(v)))if(typeof x==="string"&&!k.startsWith("__"))r[k]=x.slice(0,20000);return r};
-  const custom={};
-  for(const[k,c]of Object.entries(obj(o.custom))){
-    if(k.startsWith("__"))continue;
-    const e={};if(obj(c).values)e.values=flat(c.values);if(typeof obj(c).option==="string")e.option=c.option.slice(0,2);custom[k]=e;
-  }
-  const own=(Array.isArray(o.own)?o.own:[]).slice(0,200).map((p,i)=>{p=obj(p);return {
-    id:/^c[a-z0-9]{1,30}$/.test(p.id)?p.id:"c"+Date.now().toString(36)+i,cat:has(CATS,p.cat)?p.cat:"bon",
-    title:str(p.title,140).trim(),when:str(p.when,400).trim(),text:str(p.text,20000)}}).filter(p=>p.title&&p.text.trim());
-  const used={};for(const k of Object.keys(obj(o.used)))if(!k.startsWith("__"))used[k]=true;
-  return {favs:(Array.isArray(o.favs)?o.favs:[]).slice(0,500).map(String),profile:flat(o.profile),prospect:flat(o.prospect),custom,own,used,
-    theme:o.theme==="dark"||o.theme==="light"?o.theme:null,route:Number.isInteger(o.route)&&ROUTES[o.route]?o.route:null};
+const obj=v=>v&&typeof v==="object"&&!Array.isArray(v)?v:{};
+const okKey=k=>typeof k==="string"&&k.length<=80&&!k.startsWith("__")&&k!=="constructor"&&k!=="prototype";
+const str=(v,n=20000)=>typeof v==="string"?v.slice(0,n):"";
+const flat=(v,n=20000)=>{const r={};for(const[k,x]of Object.entries(obj(v)))if(okKey(k)&&typeof x==="string")r[k]=x.slice(0,n);return r};
+const bools=v=>{const r={};for(const[k,x]of Object.entries(obj(v)))if(okKey(k)&&x===true)r[k]=true;return r};
+const nowISO=()=>new Date().toISOString();
+const uid=pre=>pre+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36);
+function fmtDate(iso,withTime=true){
+  const d=new Date(iso);if(isNaN(d))return "";
+  return d.toLocaleString("es-ES",withTime?{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}:{day:"numeric",month:"short",year:"numeric"});
 }
-/* Los datos del prospecto escritos en versiones anteriores dentro de un prompt pasan a la ficha común. */
-function migrate(s){
+
+/* ================= Modelo de datos (esquema 2) =================
+   Todo el estado vive en un único objeto «store», versionado con «schema».
+   La capa de guardado (más abajo) es intercambiable: hoy IndexedDB o localStorage;
+   mañana podría ser una API sin tocar el resto de la aplicación. */
+const ESTADOS=["Nuevo","Pendiente de investigar","Investigado","Contacto preparado","Contactado","En conversación","Reunión conseguida","Propuesta enviada","Ganado","Perdido","Descartado"];
+const TERMINAL=new Set(["Ganado","Perdido","Descartado"]);
+const egOf=e=>e==="Ganado"?"won":TERMINAL.has(e)?"lost":ESTADOS.indexOf(e)>=4?"act":"ini";
+const CRIT=[["icp","Encaje con el cliente ideal",25],["necesidad","Necesidad potencial",20],["economica","Capacidad económica",15],["acceso","Acceso al decisor",15],["momento","Momento y señales de compra",15],["estrategico","Potencial estratégico",10]];
+
+const BLANKP=()=>({id:uid("p"),created:nowISO(),updated:nowISO(),estado:"Nuevo",afinidad:"",motivo:"",empresa:{},contacto:{},score:{},notas:"",proxima:"",proximaFecha:"",inputs:{},results:{},savedAt:{},done:{},touched:{},used:{}});
+function blank(){return {schema:2,favs:[],custom:{},own:[],used:{},theme:null,route:null,business:{},icp:{},
+  sys:{results:{},savedAt:{},done:{},touched:{}},prospects:[],active:null,ui:{view:"sistema",step:1,variants:{}}}}
+
+function sanCustom(v){
+  const out={};
+  for(const[k,c]of Object.entries(obj(v))){
+    if(!okKey(k))continue;
+    const e={};if(obj(c).values)e.values=flat(c.values);if(typeof obj(c).option==="string")e.option=c.option.slice(0,2);out[k]=e;
+  }
+  return out;
+}
+function sanOwn(a){
+  return (Array.isArray(a)?a:[]).slice(0,200).map((p,i)=>{p=obj(p);return {
+    id:/^c[a-z0-9]{1,30}$/.test(p.id)?p.id:"c"+Date.now().toString(36)+i,cat:["inv","ema","lla","bon"].includes(p.cat)?p.cat:"bon",
+    title:str(p.title,140).trim(),when:str(p.when,400).trim(),text:str(p.text,20000)}}).filter(p=>p.title&&p.text.trim());
+}
+const sanNested=(v,n)=>{const r={};for(const[k,x]of Object.entries(obj(v)))if(okKey(k))r[k]=flat(x,n);return r};
+function sanInputs(v){
+  const r={};
+  for(const[k,x]of Object.entries(obj(v))){
+    if(!okKey(k))continue;
+    if(typeof x==="string")r[k]=x.slice(0,20000);
+    else if(Array.isArray(x))r[k]=x.filter(i=>typeof i==="string").slice(0,30).map(i=>i.slice(0,300));
+  }
+  return r;
+}
+function sanP(p){
+  p=obj(p);const b=BLANKP();
+  return {id:/^p[a-z0-9]{1,40}$/.test(p.id)?p.id:b.id,created:str(p.created,40)||b.created,updated:str(p.updated,40)||b.updated,
+    estado:ESTADOS.includes(p.estado)?p.estado:"Nuevo",afinidad:["Alta","Media","Baja"].includes(p.afinidad)?p.afinidad:"",motivo:str(p.motivo,2000),
+    empresa:flat(p.empresa),contacto:flat(p.contacto),score:flat(p.score,5000),notas:str(p.notas,50000),proxima:str(p.proxima,500),proximaFecha:str(p.proximaFecha,20),
+    inputs:sanInputs(p.inputs),results:sanNested(p.results,100000),savedAt:sanNested(p.savedAt,40),done:bools(p.done),touched:bools(p.touched),used:bools(p.used)};
+}
+function sanitize2(o){
+  o=obj(o);const s=blank();
+  s.favs=(Array.isArray(o.favs)?o.favs:[]).slice(0,500).map(String);
+  s.custom=sanCustom(o.custom);s.own=sanOwn(o.own);s.used=bools(o.used);
+  s.theme=o.theme==="dark"||o.theme==="light"?o.theme:null;
+  s.route=Number.isInteger(o.route)&&o.route>=0&&o.route<ROUTES.length?o.route:null;
+  s.business=flat(o.business);s.icp=flat(o.icp);
+  const sy=obj(o.sys);s.sys={results:sanNested(sy.results,100000),savedAt:sanNested(sy.savedAt,40),done:bools(sy.done),touched:bools(sy.touched)};
+  const seen=new Set();
+  s.prospects=(Array.isArray(o.prospects)?o.prospects:[]).slice(0,1000).map(sanP).map(p=>{if(seen.has(p.id))p.id=uid("p");seen.add(p.id);return p});
+  s.active=s.prospects.some(p=>p.id===o.active)?o.active:(s.prospects[0]?s.prospects[0].id:null);
+  const ui=obj(o.ui);
+  s.ui={view:["sistema","prospectos","biblioteca"].includes(ui.view)?ui.view:"sistema",step:Number.isInteger(ui.step)&&ui.step>=1&&ui.step<=10?ui.step:1,variants:flat(ui.variants,20)};
+  return s;
+}
+/* Datos de la versión anterior (una sola ficha de prospecto y un perfil de 5 campos). */
+const OLDP={"Nombre del prospecto":"nombre","Nombre del contacto":"nombre","Cargo":"cargo","Empresa del prospecto":"empresa","Empresa":"empresa","Nombre de la empresa":"empresa","URL de LinkedIn":"linkedin","URL del perfil de LinkedIn":"linkedin","URL de la empresa":"web"};
+function fromV1(o){
+  o=obj(o);
+  const s=sanitize2({favs:o.favs,custom:o.custom,own:o.own,theme:o.theme,route:o.route});
+  s.business=flat(o.profile);
+  const pr=flat(o.prospect);
   for(const c of Object.values(s.custom)){
     if(!c.values)continue;
     for(const k of Object.keys(c.values)){
-      const src=SRC[k];
-      if(src&&src[0]==="prospect"){if(!s.prospect[src[1]]&&c.values[k].trim())s.prospect[src[1]]=c.values[k];delete c.values[k]}
+      const m=OLDP[k];if(!m)continue;
+      if(!(pr[m]||"").trim()&&c.values[k].trim())pr[m]=c.values[k];
+      delete c.values[k];
     }
   }
+  if(Object.values(pr).some(v=>v.trim())){
+    const p=BLANKP(),put=(o2,k,v)=>{if(v&&v.trim())o2[k]=v};
+    put(p.empresa,"nombre",pr.empresa);put(p.empresa,"web",pr.web);
+    put(p.contacto,"nombre",pr.nombre);put(p.contacto,"cargo",pr.cargo);put(p.contacto,"linkedin",pr.linkedin);
+    p.used=bools(o.used);s.prospects=[p];s.active=p.id;
+  }else s.used=bools(o.used);
   return s;
 }
-function load(){
+const normalize=raw=>{const o=obj(raw);return o.schema===2?sanitize2(o):fromV1(o)};
+
+/* ================= Guardado ================= */
+const DBN="prospeccion-ia",OS="kv",LS1="prospeccion-ia:v1",LS2="prospeccion-ia:v2";
+let db=null,backend="none",saveT=null,store=blank();
+function openDB(){
+  return new Promise((res,rej)=>{
+    let r;try{r=indexedDB.open(DBN,1)}catch(e){return rej(e)}
+    r.onupgradeneeded=()=>r.result.createObjectStore(OS);
+    r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);r.onblocked=()=>rej(new Error("bloqueado"));
+    setTimeout(()=>rej(new Error("tiempo agotado")),4000);
+  });
+}
+function tx(mode,fn){
+  return new Promise((res,rej)=>{
+    const t=db.transaction(OS,mode),rq=fn(t.objectStore(OS));
+    t.oncomplete=()=>res(rq&&rq.result);t.onerror=t.onabort=()=>rej(t.error||new Error("transacción cancelada"));
+  });
+}
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+async function loadStore(){
+  let raw=null,from=null,corrupt=false;
+  try{db=await openDB();const v=await tx("readonly",s=>s.get("state"));if(typeof v==="string"){raw=JSON.parse(v);from="idb"}backend="idb"}catch(e){db=null}
+  if(!raw){const t=lsGet(LS2)||lsGet(LS1);if(t){try{raw=JSON.parse(t);from="ls"}catch(e){corrupt=true}}}
+  if(!db){try{localStorage.setItem(LS2+":t","1");localStorage.removeItem(LS2+":t");backend="ls"}catch(e){backend="none"}}
+  store=normalize(raw);
+  if(raw&&(from!=="idb"||raw.schema!==2))await flush();
+  setSaveError(corrupt?"corrupt":"");
+}
+function save(){clearTimeout(saveT);saveT=setTimeout(flush,250)}
+async function flush(){
+  clearTimeout(saveT);saveT=null;
+  const json=JSON.stringify(store);
   try{
-    localStorage.setItem(KEY+":t","1");localStorage.removeItem(KEY+":t");
-    const raw=localStorage.getItem(KEY);
-    if(raw)return migrate(sanitize(JSON.parse(raw)));
-  }catch(e){storageOK=false}
-  return blank();
+    if(backend==="idb")await tx("readwrite",s=>s.put(json,"state"));
+    else if(backend==="ls")localStorage.setItem(LS2,json);
+    else{setSaveError("");return}
+    setSaveError("");
+  }catch(e){
+    if(backend==="idb"){try{localStorage.setItem(LS2,json);setSaveError("");return}catch(e2){}}
+    setSaveError(e&&e.name==="QuotaExceededError"?"quota":"fail");
+  }
 }
-let store=load();
-function save(){
-  try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){storageOK=false}
-  $("#storageNote").hidden=storageOK;
+function setSaveError(kind){
+  const n=$("#storageNote");
+  const msg=backend==="none"?"Este navegador no permite guardar datos ahora mismo: tus cambios se perderán al cerrar la página. Descarga una copia de seguridad antes de salir.":
+    kind==="quota"?"No se han podido guardar los últimos cambios porque el almacenamiento del navegador está lleno. Descarga una copia de seguridad y elimina prospectos o respuestas que ya no necesites.":
+    kind==="fail"?"No se han podido guardar los últimos cambios. Descarga una copia de seguridad para no perderlos.":
+    kind==="corrupt"?"Los datos guardados estaban dañados y no se han podido leer. Si tienes una copia de seguridad, recupérala desde el pie de página.":"";
+  n.textContent=msg;n.hidden=!msg;
 }
+addEventListener("pagehide",()=>{if(saveT)flush()});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&saveT)flush()});
+
+/* ================= Acceso a los datos ================= */
+const activeP=()=>store.prospects.find(p=>p.id===store.active)||null;
+const pById=id=>store.prospects.find(p=>p.id===id)||null;
+const fullName=p=>p?[p.contacto.nombre,p.contacto.apellidos].filter(x=>x&&x.trim()).map(x=>x.trim()).join(" "):"";
+const pname=p=>p?((p.empresa.nombre||"").trim()||fullName(p)||"Prospecto sin nombre"):"";
+function getV(path){
+  const parts=path.split(".");let o;
+  if(parts[0]==="p"){o=activeP();parts.shift();if(!o)return ""}else o=store;
+  for(const k of parts){o=o==null?undefined:o[k]}
+  return o==null?"":o;
+}
+function setV(path,val){
+  const parts=path.split(".");let o;
+  if(parts[0]==="p"){o=activeP();parts.shift();if(!o)return;o.updated=nowISO()}else o=store;
+  const last=parts.pop();
+  for(const k of parts){if(!o[k]||typeof o[k]!=="object")o[k]={};o=o[k]}
+  if(val==="")delete o[last];else o[last]=val;
+}
+const gs=path=>{const v=getV(path);return typeof v==="string"?v.trim():""};
+function ensureP(){
+  let p=activeP();
+  if(!p){p=BLANKP();store.prospects.unshift(p);store.active=p.id}
+  return p;
+}
+
+/* ================= Mi sistema: definición de los 10 pasos ================= */
+const FIELDS={};
+function f(path,label,o={}){const x={path,label,...o};FIELDS[path]=x;return x}
+const SINO=o=>[["","Sin indicar"],...o.map(x=>[x,x])];
+const CH=[["A","Email inicial"],["B","Mensaje de LinkedIn"],["C","Mensaje de WhatsApp profesional"],["D","Guion de llamada en frío"],["E","Mensaje de presentación"],["F","Solicitud de reunión"]];
+const CHDESC={A:"Email inicial: asunto y cuerpo de un máximo de 100 palabras.",B:"Mensaje de LinkedIn: nota de conexión de un máximo de 200 caracteres y mensaje posterior de un máximo de 80 palabras.",C:"Mensaje de WhatsApp profesional: un máximo de 50 palabras. Úsalo solo si ya hay relación o permiso para escribir por ese canal; indícalo en la justificación.",D:"Guion de llamada en frío: apertura de unos 30 segundos al hablar.",E:"Mensaje de presentación: quién soy y qué hago, en un máximo de 60 palabras, reutilizable en cualquier canal.",F:"Solicitud de reunión: propuesta concreta de reunión con motivo, duración y dos opciones de fecha."};
+const OBJ=["No tenemos presupuesto.","Ya trabajamos con otro proveedor.","No nos interesa.","Ahora no es el momento.","Envíame información.","Tengo que consultarlo.","No soy la persona adecuada.","Estamos satisfechos con nuestra solución actual.","Llámame más adelante."];
+const NIVELES=[["receptivo","Cliente receptivo","Tienes algo de tiempo, escuchas y haces preguntas razonables, pero no aceptas una reunión si no ves un motivo claro."],
+  ["ocupado","Cliente ocupado y poco interesado","Tienes prisa, respondes con frases cortas, intentas terminar pronto y usas objeciones como «envíame información» o «ahora no es el momento»."],
+  ["esceptico","Cliente escéptico y exigente","Dudas de cada afirmación, pides pruebas y datos concretos, comparas con tu proveedor actual y penalizas las respuestas genéricas."]];
+const RULES=`Reglas:
+- No inventes información: ni empresas, ni personas, ni cifras, ni noticias, ni datos de contacto.
+- Distingue siempre entre hechos verificados (indica la fuente), hipótesis (explica en qué te basas) e información desconocida.
+- Si te falta un dato importante, dilo y explica qué tendría que averiguar.
+- Si no puedes consultar internet, indícalo y no simules haber revisado fuentes.`;
+
+const STEPS=[
+{n:1,scope:"biz",title:"Definir mi negocio",short:"Mi negocio",
+ purpose:"Describe qué vendes, a quién y por qué te eligen. Lo escribes una vez y todos los prompts lo reutilizan.",
+ help:["Empieza por producto o servicio, problema que soluciona y cliente ideal: son los datos que más mejoran los resultados.","Si no tienes clara la propuesta de valor, genera el prompt, pégalo en tu asistente y copia en el campo «Propuesta de valor» la versión que más te convenza.","Puedes volver a este paso cuando quieras. Los cambios se aplican a todos los prompts, también a los de la biblioteca."],
+ groups:[["Sobre ti",[f("business.nombre","Tu nombre"),f("business.empresa","Nombre de tu empresa"),f("business.telefono","Teléfono profesional",{type:"tel",noCtx:1,hint:"Solo se usa en el guion de buzón de voz de la biblioteca."})]],
+  ["Lo que vendes",[f("business.sector","Sector de actividad"),f("business.producto","Producto o servicio"),f("business.descripcion","Descripción comercial",{rows:3}),f("business.problema","Problema que soluciona",{rows:3}),f("business.propuesta","Propuesta de valor",{rows:3,hint:"Qué haces, para quién y qué resultado obtiene."})]],
+  ["Por qué te eligen",[f("business.ventajas","Ventajas competitivas",{rows:3}),f("business.diferenciacion","Diferenciación frente a competidores",{rows:3}),f("business.beneficios","Beneficios económicos para el cliente",{rows:3})]],
+  ["Tu mercado y tu estilo",[f("business.clienteIdeal","Cliente ideal",{rows:3}),f("business.zona","Zona geográfica de actuación"),f("business.ticket","Ticket medio o valor estimado de venta"),f("business.objetivo","Objetivo comercial",{ph:"Por ejemplo: 4 reuniones al mes con directores de operaciones"}),f("business.tono","Tono de comunicación",{list:["Profesional y cercano","Directo","Consultivo","Formal","Informal"]})]]],
+ needs:[["business.producto","producto o servicio"],["business.problema","problema que soluciona"],["business.clienteIdeal","cliente ideal"]],
+ prompts:[{id:"vp",label:"Propuesta de valor",btn:"Ayúdame a definir mi propuesta de valor",rlabel:"Respuesta de la IA sobre tu propuesta de valor",build:k=>`Actúa como consultor de estrategia comercial B2B. Ayúdame a definir una propuesta de valor clara y convincente para mi negocio a partir de esta información.
+
+${k.ctx}${k.miss}
+
+Entrega:
+1. Diagnóstico: qué está claro en mi descripción y qué es vago, genérico o difícil de creer. Cita las frases concretas.
+2. Preguntas: hasta 5 preguntas cuyas respuestas mejorarían la propuesta.
+3. Propuesta de valor en tres formatos:
+   - Una frase de un máximo de 25 palabras: qué hago, para quién y qué resultado obtiene.
+   - Un párrafo de presentación de un máximo de 60 palabras.
+   - Tres mensajes clave, cada uno ligado a un beneficio concreto.
+4. Credibilidad: qué evidencias respaldarían cada mensaje (casos, datos, demostraciones) e indica cuáles no aparecen en mi información.
+5. Adaptación: cómo cambiar el mensaje para un decisor de dirección general, uno financiero y uno operativo.
+
+Usa el tono de comunicación indicado. Si no hay ninguno, usa un tono profesional y cercano.
+
+${RULES}
+- No atribuyas a mi empresa resultados, clientes o cifras que no aparezcan en mi información.`}]},
+
+{n:2,scope:"biz",title:"Identificar empresas objetivo",short:"Empresas objetivo",
+ purpose:"Define tu cliente ideal y registra las empresas que encajan. Cada empresa que añadas se convierte en una ficha de prospecto.",
+ help:["Rellena el perfil de cliente ideal con lo que ya sabes de tus mejores clientes.","Pide a la IA segmentos, criterios y señales de oportunidad. Si te propone empresas, comprueba cada enlace antes de registrarlas.","Registra abajo las empresas que quieras trabajar y pulsa «Investigar» para pasar al paso 3 con cada una."],
+ groups:[["Perfil de cliente ideal",[f("icp.sector","Sector"),f("icp.actividad","Actividad"),f("icp.tamano","Tamaño de empresa",{list:["Microempresa (1–9 empleados)","Pequeña (10–49)","Mediana (50–249)","Grande (250 o más)"]}),f("icp.empleados","Número aproximado de empleados"),f("icp.facturacion","Facturación estimada"),f("icp.ubicacion","Ubicación"),f("icp.tipo","Tipo de cliente",{list:["Empresa privada","Administración pública","Grupo empresarial","Asociación o fundación","Autónomos"]}),
+  f("icp.necesidades","Necesidades potenciales",{rows:3}),f("icp.prioritarias","Características de las empresas prioritarias",{rows:3}),f("icp.descartar","Empresas que deben descartarse",{rows:3})]]],
+ needs:[["business.producto","producto o servicio (paso 1)"],["icp.sector","sector del cliente ideal"],["icp.ubicacion","ubicación del cliente ideal"]],
+ prompts:[{id:"icp",label:"Segmentos y empresas",build:k=>`Actúa como analista de desarrollo de negocio B2B. Ayúdame a definir mi cliente ideal y a decidir qué empresas investigar primero.
+
+${k.ctx}${k.miss}
+
+Entrega:
+1. Segmentos adecuados: 3–5 segmentos de empresas, con el motivo de su encaje con lo que vendo.
+2. Características del cliente ideal: de la empresa (sector, tamaño, ubicación, madurez) y del comprador (cargos, responsabilidades y prioridades).
+3. Criterios de selección: imprescindibles, deseables y de descarte.
+4. Señales de oportunidad: 6–8 señales observables que indiquen que una empresa puede necesitar mi solución ahora, y dónde encontrar cada una (web, LinkedIn, ofertas de empleo, noticias, registros públicos).
+5. Empresas potenciales: propón empresas solo si puedes consultar fuentes reales, con un enlace verificable para cada una. Si no puedes verificarlas, no des nombres: explícame cómo encontrarlas yo, con búsquedas concretas en LinkedIn, buscadores y directorios sectoriales.
+6. Clasificación por afinidad: si propones empresas, clasifícalas en afinidad alta, media o baja y justifica cada una.
+7. Por dónde empezar: qué 3 empresas, o qué tipo de empresa, investigar primero y por qué.
+
+${RULES}`}]},
+
+{n:3,scope:"p",title:"Investigar la empresa",short:"Investigar",
+ purpose:"Reúne lo que sabes de la empresa y pide a la IA un análisis que separe hechos, hipótesis y lo que se desconoce.",
+ help:["Anota lo que ya sepas: web, sector, noticias o cambios recientes. No hace falta rellenarlo todo.","Si tu asistente no navega por internet, pega en él el texto de la web o de las noticias para que no trabaje a ciegas.","Guarda la respuesta: los pasos 4 a 10 la usarán automáticamente."],
+ groups:[["Datos básicos",[f("p.empresa.nombre","Nombre de la empresa"),f("p.empresa.web","Página web",{type:"url",ph:"https://"}),f("p.empresa.sector","Sector"),f("p.empresa.actividad","Actividad"),f("p.empresa.tamano","Tamaño"),f("p.empresa.ubicacion","Ubicación")]],
+  ["Lo que ya sabes",[f("p.empresa.productos","Productos y servicios",{rows:3}),f("p.empresa.clientes","Clientes o mercados atendidos",{rows:3}),f("p.empresa.noticias","Noticias recientes",{rows:3,hint:"Con fecha y enlace si los tienes."}),f("p.empresa.cambios","Cambios empresariales",{rows:3,hint:"Nuevos directivos, expansión, financiación, reorganizaciones…"}),f("p.empresa.problemas","Problemas potenciales",{rows:3}),f("p.empresa.oportunidades","Oportunidades comerciales",{rows:3})]]],
+ needs:[["p.empresa.nombre","nombre de la empresa"],["p.empresa.web","página web de la empresa"],["business.producto","producto o servicio (paso 1)"]],
+ prompts:[{id:"inv",label:"Investigación avanzada",build:k=>`Actúa como analista de inteligencia comercial. Investiga la empresa ${k.emp} para preparar un primer contacto comercial.
+
+${k.ctx}${k.miss}
+
+Entrega:
+1. Resumen ejecutivo de la empresa, en un máximo de 80 palabras.
+2. Modelo de negocio: qué venden, a quién y cómo obtienen ingresos.
+3. Principales actividades y líneas de negocio.
+4. Situación y posicionamiento en el mercado: competidores conocidos, tamaño relativo y señales de crecimiento o de dificultad.
+5. Necesidades potenciales relacionadas con lo que vendo.
+6. Posibles problemas operativos o comerciales.
+7. Oportunidades de mejora.
+8. Relación entre sus necesidades y mi producto o servicio: dónde encaja y dónde no.
+9. Tres argumentos comerciales personalizados, cada uno conectado con un hecho o con una hipótesis explícita.
+10. Fuentes y enlaces de verificación.
+
+Marca cada afirmación como [Verificado], [Hipótesis] o [Desconocido]. Las verificadas deben llevar su fuente.
+
+${RULES}`}]},
+
+{n:4,scope:"p",title:"Identificar al decisor",short:"Decisor",
+ purpose:"Registra a la persona con la que quieres hablar y entiende qué le preocupa y cómo dirigirte a ella.",
+ help:["Busca en LinkedIn o en la web de la empresa quién lleva el área relacionada con lo que vendes.","Si no sabes quién decide, registra el cargo que buscas y pide a la IA qué otros roles intervienen.","El email y el teléfono quedan en la ficha para tu uso; nunca se incluyen en los prompts."],
+ groups:[["Persona",[f("p.contacto.nombre","Nombre"),f("p.contacto.apellidos","Apellidos"),f("p.contacto.cargo","Cargo"),f("p.contacto.departamento","Departamento"),f("p.contacto.linkedin","Perfil de LinkedIn",{type:"url",ph:"https://"})]],
+  ["Contacto profesional",[f("p.contacto.email","Email profesional",{type:"email",noCtx:1}),f("p.contacto.telefono","Teléfono profesional",{type:"tel",noCtx:1})]],
+  ["Papel en la compra",[f("p.contacto.influencia","Nivel de influencia",{type:"select",options:SINO(["Alta","Media","Baja"])}),f("p.contacto.responsabilidad","Responsabilidad en la decisión de compra",{type:"select",options:SINO(["Decide la compra","Influye en la decisión","Usará la solución","Controla el presupuesto","No participa en la compra"])})]]],
+ needs:[["p.contacto.nombre","nombre del contacto"],["p.contacto.cargo","cargo del contacto"],["r:3","investigación de la empresa (paso 3)"]],
+ prompts:[{id:"dec",label:"Análisis del decisor",build:k=>`Actúa como SDR/AE B2B. Ayúdame a entender a la persona de contacto de ${k.emp} y a decidir cómo dirigirme a ella.
+
+${k.ctx}${k.miss}
+
+Entrega:
+1. Funciones que probablemente desempeña según su cargo y su departamento.
+2. Responsabilidades: cuáles constan en la información disponible y cuáles son hipótesis.
+3. Objetivos profesionales probables, marcados como hipótesis.
+4. Problemas que podría querer resolver, conectados con la investigación de la empresa.
+5. Beneficios de mi solución que pueden interesarle y por qué.
+6. Enfoque de comunicación recomendado: tono, nivel de detalle, canal y qué evitar.
+7. Cinco preguntas abiertas para iniciar la conversación.
+8. Papel en la compra: si parece decisor, influyente, usuario o responsable del presupuesto, y qué otros cargos debería contactar. No inventes nombres.
+
+Si no hay datos de la persona, indícalo y limita el análisis a lo que el cargo permite suponer, marcado como hipótesis.
+
+${RULES}
+- No inventes identidades, datos de contacto ni responsabilidades concretas.`}]},
+
+{n:5,scope:"p",title:"Analizar la oportunidad",short:"Oportunidad",
+ purpose:"Puntúa de 0 a 100 el potencial del prospecto para decidir si merece tu tiempo ahora.",
+ help:["Puntúa cada criterio con lo que sepas. Deja vacío lo que no puedas valorar: la puntuación quedará marcada como provisional.","Puedes pedir a la IA una propuesta de puntuación justificada y ajustarla tú.","80–100 es prioridad alta, 60–79 media y 0–59 baja. Es una ayuda para decidir, no una predicción."],
+ groups:[["Puntúa cada criterio",CRIT.map(([k,l,m])=>f("p.score."+k,`${l} (0–${m})`,{type:"number",max:m}))],
+  ["Tu análisis",[f("p.score.justificacion","Justificación",{rows:3}),f("p.score.fortalezas","Fortalezas",{rows:3}),f("p.score.riesgos","Riesgos",{rows:3}),f("p.score.pendiente","Información pendiente",{rows:3}),f("p.score.recomendacion","Recomendación comercial",{rows:3})]]],
+ needs:[["r:3","investigación de la empresa (paso 3)"],["r:4","análisis del decisor (paso 4)"]],
+ before:()=>`<div class="scorecard" id="scoreCard" aria-live="polite"></div>`,
+ prompts:[{id:"score",label:"Propuesta de puntuación",build:k=>`Actúa como responsable comercial que cualifica oportunidades. Evalúa el potencial de ${k.emp} con este sistema de puntuación de 0 a 100:
+
+- Encaje con el cliente ideal: 0–25.
+- Necesidad potencial: 0–20.
+- Capacidad económica: 0–15.
+- Acceso al decisor: 0–15.
+- Momento y señales de compra: 0–15.
+- Potencial estratégico: 0–10.
+
+${k.ctx}${k.miss}
+
+Entrega:
+1. Una tabla con cada criterio, la puntuación propuesta, la justificación y el nivel de confianza (alto, medio o bajo según la evidencia).
+2. Puntuación total y prioridad: 80–100 alta, 60–79 media, 0–59 baja.
+3. Fortalezas de la oportunidad.
+4. Riesgos.
+5. Información pendiente: qué datos cambiarían la puntuación y cómo conseguirlos.
+6. Recomendación comercial: avanzar ahora, investigar más o descartar, y por qué.
+
+Si un criterio no se puede valorar con la información disponible, márcalo como «sin datos» en lugar de estimarlo y aclara que el total es provisional. Si en el contexto hay una valoración mía, contrástala. No presentes la puntuación como una predicción.
+
+${RULES}`}]},
+
+{n:6,scope:"p",title:"Diseñar la estrategia comercial",short:"Estrategia",
+ purpose:"Decide qué argumento, problema, beneficio, tono y canal usar, y qué quieres conseguir con el primer contacto.",
+ help:["Si ya tienes claro el objetivo del primer contacto o el canal, indícalo. Si no, deja que la IA lo recomiende.","Compara los tres enfoques (ahorro, productividad y crecimiento) y quédate con el que mejor encaje con lo que sabes del prospecto.","Guarda la estrategia: los mensajes del paso 7 y el guion del paso 8 se basarán en ella."],
+ groups:[["Tus preferencias (opcional)",[f("p.inputs.objetivo6","Objetivo del primer contacto",{ph:"Por ejemplo: conseguir una llamada de 20 minutos"}),f("p.inputs.canal6","Canal preferido",{type:"select",options:[["","Que lo recomiende la IA"],["Email","Email"],["LinkedIn","LinkedIn"],["Teléfono","Teléfono"],["WhatsApp","WhatsApp"],["En persona","En persona"]]})]]],
+ needs:[["r:3","investigación de la empresa (paso 3)"],["r:4","análisis del decisor (paso 4)"],["business.propuesta","propuesta de valor (paso 1)"]],
+ prompts:[{id:"est",label:"Estrategia y enfoques",build:k=>`Actúa como estratega comercial B2B. Diseña la estrategia de aproximación a ${k.con} de ${k.emp}.
+
+${k.ctx}${k.pref}${k.miss}
+
+Entrega:
+1. Estrategia recomendada:
+   - Argumento comercial principal.
+   - Problema que conviene destacar.
+   - Beneficio que presentar.
+   - Tono.
+   - Canal más adecuado y por qué.
+   - Objetivo del primer contacto.
+   - Objeciones que pueden surgir.
+   - Siguiente paso que queremos conseguir.
+2. Tres enfoques alternativos, adaptados a mi producto o servicio:
+   A. Ahorro económico.
+   B. Mejora de productividad.
+   C. Crecimiento, innovación o ventaja competitiva.
+   Para cada uno: idea central, apertura de 1–2 frases, qué prueba lo respaldaría y qué riesgo tiene usarlo.
+3. Enfoque recomendado entre A, B y C, y por qué. Si alguno no encaja con mi producto, dilo.
+
+${RULES}`}]},
+
+{n:7,scope:"p",title:"Preparar el primer contacto",short:"Primer contacto",
+ purpose:"Genera los mensajes de primer contacto para los canales que elijas, en versión directa, consultiva y breve.",
+ help:["Marca los canales que vas a usar. Email y LinkedIn vienen marcados por defecto.","Revisa cada mensaje antes de enviarlo y adáptalo a tu forma de escribir.","Si una versión no te convence, usa «Pedir otras versiones» con el mensaje y lo que quieres cambiar."],
+ groups:[],
+ needs:[["r:6","estrategia comercial (paso 6)"],["p.contacto.nombre","nombre del contacto"]],
+ prompts:[
+  {id:"msg",label:"Mensajes por canal",fields:[f("p.inputs.canales","Canales",{type:"checks",options:CH.map(([a,b])=>[a,a+". "+b]),def:["A","B"]}),f("p.inputs.enfoque","Enfoque",{type:"select",options:[["","El recomendado en la estrategia"],["A","A. Ahorro económico"],["B","B. Mejora de productividad"],["C","C. Crecimiento, innovación o ventaja competitiva"]]})],
+   rlabel:"Mensajes que te ha dado la IA",build:k=>{
+    const ch=k.v("p.inputs.canales",["A","B"]),en=k.v("p.inputs.enfoque","");
+    const enT={A:"ahorro económico",B:"mejora de productividad",C:"crecimiento, innovación o ventaja competitiva"}[en];
+    return `Actúa como copywriter de prospección B2B. Prepara el primer contacto con ${k.con} de ${k.emp}.
+
+Canales:
+${ch.length?ch.map(c=>"- "+CHDESC[c]).join("\n"):"- No he elegido canal: recomiéndame uno y prepara solo ese."}
+
+Enfoque: ${enT?"el basado en "+enT+".":"el recomendado en la estrategia del contexto; si no hay estrategia, elige el más adecuado y explica por qué."}
+
+${k.ctx}${k.miss}
+
+Para cada canal entrega:
+- Versión directa.
+- Versión consultiva.
+- Versión breve.
+- Asunto, cuando el canal lo use.
+- Llamada a la acción: una sola, en forma de pregunta fácil de responder.
+- Justificación: en 1–2 frases, por qué esta estrategia para esta persona.
+
+Requisitos:
+- Mensajes naturales, profesionales, personalizados y breves, con el tono indicado en mi negocio.
+- Cada mensaje se apoya en un hecho concreto de la investigación o, si es una hipótesis, la plantea como pregunta.
+- Sin expresiones comerciales exageradas, superlativos ni afirmaciones que no se puedan comprobar.
+- No digas «vi tu LinkedIn» ni «investigué tu empresa».
+
+${RULES}`}},
+  {id:"ver",label:"Pedir otras versiones",fields:[f("p.inputs.msgActual","Mensaje que quieres mejorar",{rows:6}),f("p.inputs.msgCambio","Qué no te convence o qué quieres cambiar",{rows:2,ph:"Por ejemplo: suena demasiado comercial, es largo, la pregunta final es floja"})],
+   needs:[["p.inputs.msgActual","mensaje que quieres mejorar"]],rlabel:"Versiones nuevas que te ha dado la IA",build:k=>`Quiero otras versiones de un mensaje de prospección para ${k.con} de ${k.emp}.
+
+Mensaje actual:
+"""
+${k.v("p.inputs.msgActual","[Pega aquí el mensaje]")}
+"""
+
+Qué no me convence o qué quiero cambiar: ${k.v("p.inputs.msgCambio","no lo he indicado; mejóralo en naturalidad, brevedad y personalización")}.
+
+${k.ctx}${k.miss}
+
+Entrega 3 versiones nuevas, claramente distintas entre sí en la apertura y en la llamada a la acción, con la misma extensión máxima que el original o menos. Explica en una línea qué cambia en cada una.
+
+${RULES}`}]},
+
+{n:8,scope:"p",title:"Realizar la llamada comercial",short:"Llamada",
+ purpose:"Prepara el guion de la llamada y practícala con la IA en el papel del cliente antes de llamar de verdad.",
+ help:["Genera el guion y léelo en voz alta: si algo no suena natural, cámbialo.","Para practicar, copia el prompt de práctica en tu asistente y responde como si estuvieras al teléfono. Escribe FIN para terminar y recibir la evaluación.","Empieza por el nivel receptivo y sube de dificultad cuando te sientas cómodo."],
+ groups:[],
+ needs:[["r:6","estrategia comercial (paso 6)"],["p.contacto.nombre","nombre del contacto"]],
+ prompts:[
+  {id:"guion",label:"Guion de llamada",rlabel:"Guion que te ha dado la IA",build:k=>`Actúa como formador de ventas B2B. Prepara un guion de llamada comercial a ${k.con} de ${k.emp} cuyo objetivo es conseguir una reunión.
+
+${k.ctx}${k.miss}
+
+Organiza el guion en estos 10 bloques, con el texto que debo decir y, cuando proceda, alternativas según la respuesta:
+1. Presentación.
+2. Apertura de conversación.
+3. Motivo del contacto.
+4. Pregunta inicial.
+5. Preguntas de descubrimiento: 5–7, abiertas.
+6. Identificación de necesidades: qué escuchar y cómo confirmarlo.
+7. Presentación del valor: 2–3 frases conectadas con lo que diga.
+8. Resolución de dudas: las 3 dudas más probables y cómo responder.
+9. Propuesta de siguiente paso.
+10. Cierre para conseguir la reunión, con dos opciones de fecha.
+
+Requisitos:
+- Lenguaje hablado, con frases cortas y naturales.
+- Los primeros 30 segundos deben poder decirse sin prisa.
+- No presentes como confirmado un problema que solo es una hipótesis.
+
+${RULES}`},
+  {id:"practica",label:"Practicar la llamada",fields:[f("p.inputs.nivel","Nivel de dificultad",{type:"radios",options:NIVELES.map(x=>[x[0],x[1]]),def:"receptivo"})],rlabel:"Evaluación de tu práctica",build:k=>{
+    const nv=NIVELES.find(x=>x[0]===k.v("p.inputs.nivel","receptivo"))||NIVELES[0];
+    const yo=gs("business.nombre")||"un comercial",mi=gs("business.empresa")||"mi empresa";
+    return `Vamos a practicar una llamada comercial. Tú interpretas a ${k.con}${k.cargo?", "+k.cargo:""} de ${k.emp}. Yo soy ${yo}, de ${mi}, y te llamo para conseguir una reunión.
+
+Tu personaje: ${nv[1]}. ${nv[2]}
+
+${k.ctx}
+
+Reglas del ejercicio:
+- Responde solo como el cliente, con una intervención cada vez, y espera mi respuesta.
+- Basa el personaje en el contexto. Puedes inventar detalles de su personalidad o de su día para el ejercicio, pero son parte de la simulación: no los presentes después como datos reales de esta persona ni de su empresa.
+- No me ayudes ni me des pistas durante la llamada.
+- La llamada termina cuando yo escriba FIN o cuando el cliente cuelgue o acepte la reunión.
+
+Al terminar, sal del personaje y evalúa mi llamada de 0 a 10 en:
+1. Claridad.
+2. Capacidad de escucha.
+3. Calidad de las preguntas.
+4. Argumentación.
+5. Gestión de objeciones.
+6. Capacidad de cierre.
+Para cada criterio, cita un momento concreto de la conversación. Termina con 3 recomendaciones de mejora y una frase alternativa para el momento más flojo.
+
+Empieza contestando al teléfono como lo haría el cliente.`}}]},
+
+{n:9,scope:"p",title:"Gestionar objeciones y seguimientos",short:"Objeciones",
+ purpose:"Prepara respuestas a las objeciones más probables y una secuencia de seguimiento que aporte valor sin insistir.",
+ help:["Marca las objeciones que crees que oirás con este prospecto y añade otra si falta.","Ajusta los días entre seguimientos a tu ritmo y al del sector.","Cada seguimiento debe aportar algo nuevo. Si no tienes nada que aportar, la IA te dirá qué preparar."],
+ groups:[],
+ needs:[["r:6","estrategia comercial (paso 6)"]],
+ prompts:[
+  {id:"obj",label:"Objeciones",fields:[f("p.inputs.objeciones","Objeciones que quieres preparar",{type:"checks",options:OBJ.map(o=>[o,o.replace(/\.$/,"")]),def:OBJ.slice()}),f("p.inputs.objOtra","Otra objeción",{ph:"Escríbela si no está en la lista"})],
+   rlabel:"Respuestas que te ha dado la IA",build:k=>{
+    const l=k.v("p.inputs.objeciones",OBJ.slice()).concat(k.v("p.inputs.objOtra","")?[k.v("p.inputs.objOtra","")]:[]);
+    return `Actúa como formador de ventas B2B. Prepárame para gestionar estas objeciones de ${k.con} de ${k.emp}:
+${l.length?l.map(o=>"- «"+o.replace(/\.$/,"")+"»").join("\n"):"- No he elegido ninguna: propón las 5 más probables para este prospecto."}
+
+${k.ctx}${k.miss}
+
+Para cada objeción entrega:
+1. Qué puede significar realmente: 2–3 interpretaciones posibles.
+2. Cómo interpretarla: la pregunta que haría para saber cuál es.
+3. Respuesta recomendada: 1–3 frases conversacionales y empáticas.
+4. Errores que evitar.
+5. Cómo intentar avanzar sin presionar, incluido cuándo aceptar un no y dejar la puerta abierta.
+
+Adapta las respuestas a su cargo, a la investigación y a mi producto. Presenta las objeciones como posibilidades, no como algo que el prospecto haya dicho.
+
+${RULES}
+- No inventes pruebas, clientes ni resultados para responder.`}},
+  {id:"seq",label:"Secuencia de seguimiento",fields:[f("p.inputs.d1","Primer seguimiento: días después del primer contacto",{type:"number",max:90,def:"3"}),f("p.inputs.d2","Segundo seguimiento: días después del anterior",{type:"number",max:90,def:"4"}),f("p.inputs.d3","Tercer seguimiento: días después del anterior",{type:"number",max:90,def:"7"}),f("p.inputs.d4","Último contacto: días después del anterior",{type:"number",max:90,def:"10"}),
+    f("p.inputs.seqCanales","Canales de la secuencia",{type:"checks",options:[["Email","Email"],["LinkedIn","LinkedIn"],["Llamada","Llamada"]],def:["Email","LinkedIn","Llamada"]})],
+   rlabel:"Secuencia que te ha dado la IA",build:k=>{
+    const d=n=>k.v("p.inputs.d"+n,FIELDS["p.inputs.d"+n].def),cs=k.v("p.inputs.seqCanales",["Email","LinkedIn","Llamada"]);
+    return `Actúa como especialista en prospección multicanal. Diseña una secuencia de seguimiento para ${k.con} de ${k.emp}, que no ha respondido al primer contacto.
+
+Canales disponibles: ${cs.length?cs.join(", "):"elige tú los más adecuados"}.
+Calendario:
+- Primer seguimiento: ${d(1)} días después del primer contacto.
+- Segundo seguimiento: ${d(2)} días después del anterior.
+- Tercer seguimiento: ${d(3)} días después del anterior.
+- Último contacto: ${d(4)} días después del anterior.
+
+${k.ctx}${k.miss}
+
+Para cada contacto entrega: día, canal, objetivo, el mensaje completo (con asunto si es un email), el valor nuevo que aporta y la llamada a la acción.
+
+Requisitos:
+- Cada mensaje aporta algo nuevo: un dato verificable, una idea útil, un caso o una pregunta distinta. Si no tienes material verificable, dilo y propón qué podría preparar yo.
+- Cada mensaje es más breve que el anterior, con un máximo de 80 palabras.
+- Sin reproches ni urgencias artificiales.
+- El último contacto cierra el hilo con educación y deja la puerta abierta.
+
+${RULES}`}}]},
+
+{n:10,scope:"p",title:"Conseguir la reunión y medir resultados",short:"Reunión",
+ purpose:"Prepara la reunión comercial y registra cómo ha ido para mantener al día la ficha del prospecto.",
+ help:["Indica fecha, duración y asistentes si ya los conoces.","Después de la reunión, actualiza el estado y apunta la próxima acción.","El panel de métricas y el registro de interacciones llegarán en la siguiente fase."],
+ groups:[],
+ needs:[["r:3","investigación de la empresa (paso 3)"],["r:6","estrategia comercial (paso 6)"]],
+ prompts:[{id:"reu",label:"Preparar la reunión",fields:[f("p.inputs.fechaReunion","Fecha de la reunión",{type:"date"}),f("p.inputs.durReunion","Duración",{ph:"Por ejemplo: 30 minutos"}),f("p.inputs.asistentes","Asistentes",{ph:"Nombres y cargos, si los sabes"})],
+  rlabel:"Preparación que te ha dado la IA",build:k=>`Actúa como AE B2B. Prepara mi reunión comercial con ${k.con} de ${k.emp}.
+
+Datos de la reunión:
+- Fecha: ${k.v("p.inputs.fechaReunion","sin fijar")}.
+- Duración: ${k.v("p.inputs.durReunion","sin indicar; propón una agenda de 30 minutos")}.
+- Asistentes: ${k.v("p.inputs.asistentes","sin indicar")}.
+
+${k.ctx}${k.miss}
+
+Entrega:
+1. Objetivo de la reunión: qué debo saber al terminar y qué siguiente paso quiero acordar.
+2. Agenda con tiempos ajustados a la duración.
+3. Preguntas clave: 8–10, agrupadas en situación actual, necesidades, impacto, proceso de decisión y plazos. Marca las 3 imprescindibles.
+4. Necesidades que validar: las hipótesis de los pasos anteriores, cada una con la pregunta que la confirma o la descarta.
+5. Beneficios que presentar, conectados con sus necesidades.
+6. Documentación necesaria: qué preparar o llevar.
+7. Posibles objeciones y cómo responder.
+8. Próximos pasos: 2–3 opciones para proponer al final, con fechas.
+
+${RULES}
+- No presentes las hipótesis como hechos durante la reunión.`}],
+ after:()=>`<section class="sub" aria-labelledby="resH"><h4 id="resH">Registrar el resultado</h4><p class="muted">Actualiza el estado del prospecto y apunta la próxima acción. Se verá en su ficha.</p><div class="fgrid">
+  ${fieldHTML(f("p.estado","Estado del prospecto",{type:"select",options:ESTADOS.map(e=>[e,e])}))}
+  ${fieldHTML(f("p.proxima","Próxima acción",{ph:"Por ejemplo: enviar propuesta"}))}
+  ${fieldHTML(f("p.proximaFecha","Fecha de la próxima acción",{type:"date"}))}
+  ${fieldHTML(f("p.notas","Notas",{rows:4}))}</div></section>`}
+];
+const stepDef=n=>STEPS[n-1];
+const fieldsOfStep=n=>stepDef(n).groups.flatMap(g=>g[1]);
+const CTXPLAN={1:["biz"],2:["biz","icp"],3:["biz","icp","emp"],4:["biz","emp","con",3],5:["biz","icp","emp","con","score",3,4],6:["biz","emp","con","score",3,4,5],
+  7:["biz","emp","con","score",3,4,6],8:["biz","emp","con",3,4,6],9:["biz","emp","con",4,6,7],10:["biz","emp","con","score",3,4,6,8,9]};
+const SEC={biz:["Mi negocio",1],icp:["Mi cliente ideal",2],emp:["Empresa prospecto",3],con:["Persona de contacto",4]};
+const AUTO={3:"Investigado",7:"Contacto preparado"};
+
+/* ================= Contexto y prompts ================= */
+const isGlobal=n=>n<=2;
+const stepRec=n=>isGlobal(n)?store.sys:activeP();
+const hasResult=n=>{const r=stepRec(n);return !!(r&&r.results[n]&&Object.values(r.results[n]).some(v=>v.trim()))};
+const isDone=n=>{const r=stepRec(n);return !!(r&&r.done[n])};
+function valOr(path,def){const v=getV(path);if(Array.isArray(v))return v;return typeof v==="string"&&v.trim()?v.trim():def}
+function ctxLines(fields){
+  return fields.filter(x=>!x.noCtx&&x.type!=="number").map(x=>{
+    const v=gs(x.path);if(!v)return "";
+    return v.includes("\n")?`- ${x.label}:\n${v.replace(/^/gm,"  ")}`:`- ${x.label}: ${v}`;
+  }).filter(Boolean);
+}
+function scoreInfo(p){
+  let tot=0,n=0;
+  for(const[k,,max]of CRIT){const v=parseInt(p&&p.score[k],10);if(Number.isFinite(v)){tot+=Math.max(0,Math.min(max,v));n++}}
+  return {tot,n,prio:tot>=80?"alta":tot>=60?"media":"baja"};
+}
+function scoreText(){
+  const p=activeP();if(!p)return "";
+  const si=scoreInfo(p);
+  const txt=ctxLines(fieldsOfStep(5));
+  if(!si.n&&!txt.length)return "";
+  const crit=CRIT.map(([k,l,m])=>{const v=parseInt(p.score[k],10);return `- ${l}: ${Number.isFinite(v)?Math.max(0,Math.min(m,v)):"sin valorar"}/${m}`});
+  return `Puntuación de la oportunidad (valoración mía, orientativa; no es una predicción):\n- Total: ${si.n?si.tot+"/100, prioridad "+si.prio:"sin puntuar"}${si.n&&si.n<6?` (provisional: ${si.n} de 6 criterios valorados)`:""}\n${crit.join("\n")}${txt.length?"\n"+txt.join("\n"):""}`;
+}
+function resultsText(s){
+  const rec=stepRec(s);if(!rec||!rec.results[s])return "";
+  const st=stepDef(s);
+  return st.prompts.map(v=>{const t=(rec.results[s][v.id]||"").trim();return t?`Resultado del paso ${s}, ${st.title.toLowerCase()}${st.prompts.length>1?` (${v.label.toLowerCase()})`:""}:\n"""\n${t}\n"""`:""}).filter(Boolean).join("\n\n");
+}
+function ctxText(n){
+  const out=[];
+  for(const it of CTXPLAN[n]){
+    if(typeof it==="number"){const r=resultsText(it);if(r)out.push(r);continue}
+    if(it==="score"){const s=scoreText();if(s)out.push(s);continue}
+    const[t,sn]=SEC[it],l=ctxLines(fieldsOfStep(sn));
+    out.push(`${t}:\n${l.length?l.join("\n"):"- Sin datos todavía."}`);
+  }
+  return "CONTEXTO\n\n"+out.join("\n\n");
+}
+function missing(n,v){
+  const s=stepDef(n);
+  return [...(s.needs||[]),...((v&&v.needs)||[])].filter(([path])=>path.startsWith("r:")?!hasResult(+path.slice(2)):!gs(path)).map(x=>x[1]);
+}
+function buildPrompt(n,v){
+  const p=activeP(),m=missing(n,v);
+  const pref=[gs("p.inputs.objetivo6")&&`- Objetivo del primer contacto que me interesa: ${gs("p.inputs.objetivo6")}.`,gs("p.inputs.canal6")&&`- Canal que prefiero: ${gs("p.inputs.canal6")}.`].filter(Boolean);
+  return v.build({p,emp:(p&&gs("p.empresa.nombre"))||"la empresa prospecto",con:(p&&fullName(p))||"la persona de contacto",cargo:p&&gs("p.contacto.cargo"),
+    v:valOr,ctx:ctxText(n),pref:pref.length&&n===6?"\n\nMis preferencias:\n"+pref.join("\n"):"",
+    miss:m.length?`\n\nDatos no disponibles: ${m.join("; ")}. No los supongas: indica qué parte de tu respuesta queda limitada por su ausencia.`:""});
+}
+
+/* ================= Mi sistema: interfaz ================= */
+const STTXT={done:"Completado",progress:"En curso",pending:"Pendiente"};
+const shownPrompts={};
+function inProgress(n){
+  const r=stepRec(n);if(!r)return false;
+  if(r.touched[n]||hasResult(n))return true;
+  const s=stepDef(n);
+  return s.groups.flatMap(g=>g[1]).concat(s.prompts.flatMap(v=>v.fields||[])).some(x=>{const v=getV(x.path);return Array.isArray(v)||(typeof v==="string"&&v.trim())});
+}
+function stepState(n){
+  if(!isGlobal(n)&&!activeP())return "pending";
+  return isDone(n)?"done":inProgress(n)?"progress":"pending";
+}
+const curVariant=n=>{const s=stepDef(n),id=store.ui.variants[n];return s.prompts.find(x=>x.id===id)||s.prompts[0]};
+const ctlId=path=>"x-"+path.replace(/[^a-zA-Z0-9]/g,"-");
+function fieldHTML(x){
+  const id=ctlId(x.path),hint=x.hint?`<small id="${id}-h">${esc(x.hint)}</small>`:"",desc=x.hint?` aria-describedby="${id}-h"`:"";
+  if(x.type==="checks"||x.type==="radios"){
+    const t=x.type==="checks"?"checkbox":"radio";
+    return `<fieldset class="checks wide"><legend>${esc(x.label)}</legend><div class="opts2">${x.options.map(([val,lab],i)=>
+      `<label class="check"><input type="${t}" name="${id}" id="${id}-${i}" data-path="${x.path}" value="${esc(val)}"> ${esc(lab)}</label>`).join("")}</div>${hint}</fieldset>`;
+  }
+  let ctl;
+  if(x.type==="select")ctl=`<select class="sel" id="${id}" data-path="${x.path}"${desc}>${x.options.map(([val,lab])=>`<option value="${esc(val)}">${esc(lab)}</option>`).join("")}</select>`;
+  else if(x.rows)ctl=`<textarea id="${id}" data-path="${x.path}" rows="${x.rows}"${x.ph?` placeholder="${esc(x.ph)}"`:""}${desc}></textarea>`;
+  else{
+    const list=x.list?` list="${id}-l"`:"",dl=x.list?`<datalist id="${id}-l">${x.list.map(o=>`<option value="${esc(o)}"></option>`).join("")}</datalist>`:"";
+    const num=x.type==="number"?` min="${x.min||0}" max="${x.max}" step="1" inputmode="numeric"`:"";
+    ctl=`<input id="${id}" data-path="${x.path}" type="${x.type||"text"}"${num}${list}${x.ph?` placeholder="${esc(x.ph)}"`:""} autocomplete="off"${desc}>${dl}`;
+  }
+  return `<div class="field${x.rows?" wide":""}"><label for="${id}">${esc(x.label)}</label>${ctl}${hint}</div>`;
+}
+function setCtl(el){
+  const x=FIELDS[el.dataset.path],v=valOr(el.dataset.path,x&&x.def!==undefined?x.def:"");
+  if(el.type==="checkbox")el.checked=Array.isArray(v)&&v.includes(el.value);
+  else if(el.type==="radio")el.checked=v===el.value;
+  else el.value=Array.isArray(v)?"":v;
+}
+const groupHTML=([title,fields])=>fields.length?`<fieldset class="fgroup"><legend>${esc(title)}</legend><div class="fgrid">${fields.map(fieldHTML).join("")}</div></fieldset>`:"";
+
+function renderProgress(){
+  const p=activeP(),d=[1,2].filter(isDone).length+(p?[3,4,5,6,7,8,9,10].filter(n=>p.done[n]).length:0);
+  $("#sysProgressTxt").textContent=p?`${d} de 10 pasos completados con «${pname(p)}»`:`${d} de 2 pasos de tu negocio completados. Crea o elige un prospecto para seguir.`;
+  $("#sysProgressBar").style.width=(d*10)+"%";
+}
+function stItem(n){
+  const s=stepDef(n),st=stepState(n),cur=store.ui.step===n;
+  return `<li><button type="button" class="st is-${st}" data-step="${n}" title="Paso ${n}: ${esc(s.title)}"${cur?' aria-current="step"':""}><span class="dot" aria-hidden="true">${st==="done"?"✓":n}</span><span class="lbl" aria-hidden="true">${esc(s.short)}</span><span class="sr">Paso ${n}: ${esc(s.title)}, ${STTXT[st].toLowerCase()}</span></button></li>`;
+}
+function renderStepper(){
+  const p=activeP();
+  $("#stepper").innerHTML=`<div><p class="sg">Tu negocio</p><ol class="stepper">${[1,2].map(stItem).join("")}</ol></div><div><p class="sg">${p?"Prospecto: "+esc(pname(p)):"Prospecto: sin elegir"}</p><ol class="stepper">${[3,4,5,6,7,8,9,10].map(stItem).join("")}</ol></div>`;
+  renderProgress();
+}
+function stepFoot(n){
+  const dis=!isGlobal(n)&&!activeP(),done=isDone(n),nx=n<10?stepDef(n+1):null;
+  return `<footer class="sc-foot"><button type="button" class="btn" data-act="prev"${n===1?" disabled":""}>Paso anterior</button>
+    <button type="button" class="btn toggle" data-act="done" aria-pressed="${done}"${dis?" disabled":""}>${done?"Completado ✓":"Marcar como completado"}</button>
+    ${nx?`<button type="button" class="btn primary" data-act="next" id="btnNext">Siguiente: ${pad(n+1)} ${esc(nx.short)}</button>`:`<button type="button" class="btn primary" data-act="gocrm">Ver mis prospectos</button>`}</footer>`;
+}
+function renderStep(focus){
+  const n=store.ui.step,s=stepDef(n),p=activeP(),st=stepState(n),v=curVariant(n),key=n;
+  let h=`<header class="sc-head"><span class="sc-num" aria-hidden="true">${pad(n)}</span><div class="sc-t"><div class="meta"><span class="state is-${st}" id="scState">${STTXT[st]}</span><span class="tag">${isGlobal(n)?"Tu negocio":p?"Prospecto: "+esc(pname(p)):"Requiere un prospecto"}</span></div>
+    <h3 id="scTitle" tabindex="-1">Paso ${n}. ${esc(s.title)}</h3><p>${esc(s.purpose)}</p></div></header><div class="sc-body">
+    <details class="help"><summary>Cómo hacer este paso</summary><ol>${s.help.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></details>`;
+  if(!isGlobal(n)&&!p){
+    h+=`<div class="empty-in"><p>Este paso trabaja sobre un prospecto concreto. Crea uno o elige uno de tu lista; también puedes registrar empresas en el paso 2.</p><div class="row-btns"><button type="button" class="btn primary" data-act="newp">Nuevo prospecto</button>${store.prospects.length?'<button type="button" class="btn" data-act="gocrm">Elegir en Prospectos</button>':'<button type="button" class="btn" data-act="go2">Ir al paso 2</button>'}</div></div></div>`+stepFoot(n);
+    $("#stepCard").innerHTML=h;if(focus)$("#scTitle").focus();return;
+  }
+  if(s.before)h+=s.before();
+  h+=s.groups.map(groupHTML).join("");
+  if(s.prompts.length>1)h+=`<div class="variants"><p class="fsub" id="vl${n}"><strong>¿Qué quieres preparar?</strong></p><div class="seg" role="group" aria-labelledby="vl${n}">${s.prompts.map(x=>`<button type="button" data-variant="${x.id}" aria-pressed="${x.id===v.id}">${esc(x.label)}</button>`).join("")}</div></div>`;
+  if(v.fields)h+=groupHTML(["Datos para este prompt",v.fields]);
+  h+=`<div class="missing" id="scMissing" role="status" aria-live="polite"></div>
+    <section class="promptbox" aria-labelledby="pbH"><h4 id="pbH">Instrucciones para tu asistente de IA</h4>
+    <p class="small-note">Copia el prompt, pégalo en ChatGPT, Claude u otro asistente y trae aquí su respuesta. Esta web no se conecta con ellos: no envía ni recibe nada por ti.</p>
+    <div class="pb-actions" id="pbGen"${shownPrompts[key]?" hidden":""}><button type="button" class="btn primary" data-act="gen">${esc(v.btn||"Generar instrucciones para IA")}</button></div>
+    <div id="pbOut"${shownPrompts[key]?"":" hidden"}><pre class="pv" id="pbText" tabindex="0" aria-label="Prompt generado"></pre>
+    <p class="small-note">El prompt se actualiza solo cuando cambias los datos.</p>
+    <div class="pb-actions"><button type="button" class="btn primary" data-act="copyp">Copiar prompt</button>
+    <a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" data-act="openai">Copiar y abrir ChatGPT</a>
+    <a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" data-act="openai">Copiar y abrir Claude</a>
+    <button type="button" class="btn" data-act="savep">Guardar en Mis prompts</button></div></div></section>
+    <section class="resultbox" aria-labelledby="rbH"><div class="field"><label id="rbH" for="resText">${esc(v.rlabel||"Respuesta de la IA")}</label>
+    <textarea id="resText" data-result="${v.id}" rows="10" placeholder="Pega aquí la respuesta de tu asistente de IA." aria-describedby="resMeta"></textarea>
+    <small id="resMeta"></small></div><div class="pb-actions"><button type="button" class="btn" data-act="saveres">Guardar resultado</button></div></section>`;
+  if(s.after)h+=s.after();
+  h+=`</div>`+stepFoot(n);
+  const card=$("#stepCard");card.innerHTML=h;
+  $$("[data-path]",card).forEach(setCtl);
+  const rec=stepRec(n);$("#resText").value=(rec.results[n]&&rec.results[n][v.id])||"";
+  resMeta(n,v);updateMissing();updatePrompt();
+  if(n===5)updateScore();
+  if(focus)$("#scTitle").focus();
+}
+function resMeta(n,v){
+  const rec=stepRec(n),at=rec&&rec.savedAt[n]&&rec.savedAt[n][v.id];
+  const used=Object.entries(CTXPLAN).filter(([k,a])=>+k>n&&a.includes(n)).map(([k])=>+k);
+  $("#resMeta").textContent=(at&&(rec.results[n]||{})[v.id]?`Guardado el ${fmtDate(at)}. `:"")+(used.length?`Se usará en ${used.length>1?"los pasos":"el paso"} ${used.join(", ").replace(/, (\d+)$/," y $1")}.`:"");
+}
+function updateMissing(){
+  const el=$("#scMissing");if(!el)return;
+  const n=store.ui.step,m=missing(n,curVariant(n));
+  el.className="missing"+(m.length?"":" ok");
+  el.innerHTML=m.length?`<strong>Falta información:</strong> ${esc(m.join("; "))}. Puedes continuar: el prompt pedirá a la IA que no lo suponga.`:"Tienes los datos principales para este paso.";
+}
+function updatePrompt(){const pre=$("#pbText");if(pre&&!$("#pbOut").hidden)pre.textContent=buildPrompt(store.ui.step,curVariant(store.ui.step))}
+function updateScore(){
+  const el=$("#scoreCard");if(!el)return;
+  const si=scoreInfo(activeP());
+  el.innerHTML=`<div class="scorenum">${si.n?si.tot:"–"}<small>/100</small></div><div><span class="prio" data-p="${si.n?si.prio:""}">${si.n?"Prioridad "+si.prio:"Sin puntuar"}</span><p class="muted">${si.n===6?"Puntuación orientativa con los 6 criterios valorados. No es una predicción.":si.n?`Valoración provisional: ${si.n} de 6 criterios puntuados. Completa el resto antes de decidir.`:"Puntúa cada criterio con lo que sepas. Puedes pedir a la IA una propuesta y ajustarla tú."}</p></div>`;
+}
+function refreshStates(){
+  const n=store.ui.step,st=stepState(n),el=$("#scState");
+  if(el){el.className="state is-"+st;el.textContent=STTXT[st]}
+  renderStepper();
+}
+function touch(n){const r=stepRec(n);if(r&&!r.touched[n]){r.touched[n]=true}}
+function goStep(n,focus){
+  store.ui.step=n;save();renderStepper();renderStep(focus);
+  if(focus){const c=$("#stepper");if(c.getBoundingClientRect().top<0)c.scrollIntoView({block:"start"})}
+  const cur=$(`.st[data-step="${n}"]`);if(cur)cur.scrollIntoView({block:"nearest",inline:"nearest"});
+}
+function renderSystem(){renderStepper();renderStep(false)}
+
+/* Eventos de la tarjeta de paso */
+const card=$("#stepCard");
+function onField(e){
+  const el=e.target,n=store.ui.step;
+  if(el.id==="resText"){
+    const rec=stepRec(n),v=el.dataset.result;
+    rec.results[n]=rec.results[n]||{};rec.savedAt[n]=rec.savedAt[n]||{};
+    if(el.value.trim()){rec.results[n][v]=el.value;rec.savedAt[n][v]=nowISO()}else{delete rec.results[n][v];delete rec.savedAt[n][v]}
+    if(!isGlobal(n))activeP().updated=nowISO();
+    save();resMeta(n,curVariant(n));updateMissing();refreshStates();return;
+  }
+  const path=el.dataset.path;if(!path)return;
+  if(e.type==="input"&&(el.type==="checkbox"||el.type==="radio"||el.tagName==="SELECT"))return;
+  let val;
+  if(el.type==="checkbox")val=$$(`[data-path="${path}"]`,card).filter(x=>x.checked).map(x=>x.value);
+  else val=el.value;
+  if(el.type==="number"&&e.type==="change"&&val!==""){
+    const x=FIELDS[path],num=Math.max(0,Math.min(x.max,Math.round(+val)||0));
+    if(String(num)!==val){el.value=num;val=String(num)}
+  }
+  setV(path,typeof val==="string"&&!val.trim()?"":val);
+  touch(n);save();
+  if(path.startsWith("p.empresa.nombre")||path.startsWith("p.contacto.nombre")||path.startsWith("p.contacto.apellidos")||path==="p.estado")renderShell();
+  updateMissing();updatePrompt();refreshStates();
+  if(n===5)updateScore();
+}
+card.addEventListener("input",onField);
+card.addEventListener("change",onField);
+card.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act],[data-variant]");if(!b)return;
+  const n=store.ui.step,v=curVariant(n),act=b.dataset.act;
+  if(b.dataset.variant){store.ui.variants[n]=b.dataset.variant;save();renderStep(false);const nb=$(`[data-variant="${b.dataset.variant}"]`,card);if(nb)nb.focus();return}
+  if(act==="gen"){shownPrompts[n]=1;touch(n);save();$("#pbGen").hidden=true;$("#pbOut").hidden=false;updatePrompt();refreshStates();$("#pbText").focus();toast("Instrucciones generadas")}
+  else if(act==="copyp"){touch(n);save();refreshStates();copyText(buildPrompt(n,v),b,"Prompt del paso "+n)}
+  else if(act==="openai"){touch(n);save();copyText(buildPrompt(n,v),null,"Prompt del paso "+n)}
+  else if(act==="savep"){
+    const p=activeP(),cat={1:"inv",2:"inv",3:"inv",4:"inv",5:"inv",6:"bon",7:"ema",8:"lla",9:"bon",10:"lla"}[n];
+    const np={id:uid("c"),cat,title:(`Paso ${n}: ${v.label}`+(p&&!isGlobal(n)?` (${pname(p)})`:"")).slice(0,140),when:`Guardado desde Mi sistema el ${fmtDate(nowISO(),false)}.`,text:buildPrompt(n,v)};
+    store.own.push(np);save();renderShell();doneFlash(b);toast("Guardado en Mis prompts, dentro de la Biblioteca");
+  }
+  else if(act==="saveres"){flush();doneFlash(b);toast("Resultado guardado");resMeta(n,v)}
+  else if(act==="prev")goStep(n-1,true);
+  else if(act==="next")goStep(n+1,true);
+  else if(act==="done"){
+    const rec=stepRec(n);rec.done[n]=!rec.done[n];if(!rec.done[n])delete rec.done[n];
+    let msg=rec.done[n]?`Paso ${n} completado`:`Paso ${n} marcado como pendiente`;
+    const p=activeP();
+    if(rec.done[n]&&AUTO[n]&&p&&!TERMINAL.has(p.estado)&&ESTADOS.indexOf(p.estado)<ESTADOS.indexOf(AUTO[n])){p.estado=AUTO[n];msg+=`. Estado del prospecto: ${AUTO[n]}`;renderShell()}
+    if(!isGlobal(n))p.updated=nowISO();
+    save();b.setAttribute("aria-pressed",!!rec.done[n]);b.textContent=rec.done[n]?"Completado ✓":"Marcar como completado";
+    refreshStates();toast(msg);
+    const nx=$("#btnNext");if(rec.done[n]&&nx){nx.classList.remove("nudge");void nx.offsetWidth;nx.classList.add("nudge")}
+  }
+  else if(act==="newp")openPDialog(null,b);
+  else if(act==="gocrm")showView("prospectos",true);
+  else if(act==="go2")goStep(2,true);
+  else if(act==="investigar"){setActive(b.dataset.id,true);goStep(3,true)}
+});
+card.addEventListener("submit",e=>{
+  if(e.target.id!=="addEmp")return;
+  e.preventDefault();
+  const nm=$("#ae-n").value.trim(),err=$("#aeErr");
+  if(!nm){err.textContent="Escribe el nombre de la empresa.";err.hidden=false;$("#ae-n").focus();return}
+  const p=BLANKP();p.estado="Pendiente de investigar";p.empresa.nombre=nm;
+  const w=$("#ae-w").value.trim();if(w)p.empresa.web=w;
+  p.afinidad=$("#ae-a").value;p.motivo=$("#ae-m").value.trim();
+  store.prospects.unshift(p);if(!activeP())store.active=p.id;
+  save();renderShell();renderStep(false);$("#ae-n").focus();toast(`«${nm}» añadida a tus prospectos`);
+});
+function doneFlash(btn){
+  if(!btn.dataset.label)btn.dataset.label=btn.innerHTML;
+  btn.classList.add("done");btn.innerHTML="Hecho ✓";
+  clearTimeout(btn._t);btn._t=setTimeout(()=>{btn.classList.remove("done");btn.innerHTML=btn.dataset.label},1600);
+}
+/* Paso 2: tabla de empresas objetivo */
+STEPS[1].after=()=>{
+  const rows=store.prospects.map(p=>`<tr><th scope="row">${esc(pname(p))}${p.empresa.web?`<small>${esc(p.empresa.web)}</small>`:""}${p.motivo?`<small>${esc(p.motivo)}</small>`:""}</th>
+    <td><select class="sel" data-aff="${p.id}" aria-label="Afinidad de ${esc(pname(p))}">${[["","Sin valorar"],["Alta","Alta"],["Media","Media"],["Baja","Baja"]].map(([a,l])=>`<option value="${a}"${p.afinidad===a?" selected":""}>${l}</option>`).join("")}</select></td>
+    <td><span class="estado" data-eg="${egOf(p.estado)}">${esc(p.estado)}</span></td>
+    <td><button type="button" class="btn" data-act="investigar" data-id="${p.id}">Investigar<span class="sr">: ${esc(pname(p))}</span></button></td></tr>`).join("");
+  return `<section class="sub" aria-labelledby="etH"><h4 id="etH">Empresas objetivo</h4><p class="muted">Registra las empresas que encajan con tu cliente ideal. Cada una se convierte en una ficha de prospecto.</p>
+  <form class="addrow" id="addEmp" novalidate>
+    <div class="field"><label for="ae-n">Empresa</label><input id="ae-n" type="text" autocomplete="off"></div>
+    <div class="field"><label for="ae-w">Web</label><input id="ae-w" type="url" autocomplete="off" placeholder="https://"></div>
+    <div class="field"><label for="ae-a">Afinidad</label><select class="sel" id="ae-a"><option value="">Sin valorar</option><option>Alta</option><option>Media</option><option>Baja</option></select></div>
+    <div class="field"><label for="ae-m">Motivo de interés</label><input id="ae-m" type="text" autocomplete="off"></div>
+    <button class="btn primary" type="submit">Añadir empresa</button>
+  </form><p class="err" id="aeErr" role="alert" hidden></p>
+  ${store.prospects.length?`<div class="tblwrap"><table class="tbl"><caption class="sr">Empresas objetivo registradas</caption><thead><tr><th scope="col">Empresa</th><th scope="col">Afinidad</th><th scope="col">Estado</th><th scope="col"><span class="sr">Acción</span></th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p class="muted">Aún no has añadido empresas.</p>`}</section>`;
+};
+card.addEventListener("change",e=>{
+  const s=e.target.closest("[data-aff]");if(!s)return;
+  const p=pById(s.dataset.aff);if(p){p.afinidad=s.value;p.updated=nowISO();save()}
+});
+
+/* ¿Qué tengo que hacer ahora? */
+const WHY={3:"Investiga la empresa antes de contactar.",4:"Identifica a la persona que decide o influye en la compra.",5:"Puntúa la oportunidad para decidir si merece tu tiempo ahora.",6:"Define qué decir, a quién y por qué canal.",7:"Prepara los mensajes de primer contacto.",8:"Prepara la llamada y practícala antes de hacerla.",9:"Anticipa las objeciones y programa los seguimientos.",10:"Prepara la reunión y registra el resultado."};
+const firstOpen=p=>[3,4,5,6,7,8,9,10].find(n=>!p.done[n])||null;
+function whatNow(){
+  const b=store.business,bf=["nombre","empresa","producto","problema","clienteIdeal"].filter(k=>(b[k]||"").trim()).length;
+  if(!store.sys.done[1]&&bf<3)return {step:1,why:"Empieza por definir tu negocio. Todos los prompts usan esta información, así que es lo que más mejora los resultados."};
+  if(!store.prospects.length)return {step:2,why:"Define tu cliente ideal y registra las primeras empresas objetivo para empezar a investigarlas."};
+  const p=activeP();
+  if(!p||TERMINAL.has(p.estado)){
+    const open=store.prospects.filter(x=>!TERMINAL.has(x.estado));
+    if(!open.length)return {step:2,why:"Todos tus prospectos están cerrados. Registra nuevas empresas objetivo."};
+    const best=open.slice().sort((a,c)=>scoreInfo(c).tot-scoreInfo(a).tot||c.updated.localeCompare(a.updated))[0];
+    return {step:firstOpen(best)||10,pid:best.id,why:(p?`«${pname(p)}» está cerrado (${p.estado.toLowerCase()}). `:"")+`Continúa con «${pname(best)}»${scoreInfo(best).n?`, que tiene ${scoreInfo(best).tot}/100 puntos`:""}.`};
+  }
+  const s=firstOpen(p);
+  if(!s)return {step:10,crm:true,why:`Has completado los 10 pasos con «${pname(p)}». Registra el resultado y elige el siguiente prospecto.`};
+  let why=`Con «${pname(p)}»: ${WHY[s]}`;
+  const si=scoreInfo(p);
+  if(s>5&&si.n&&si.tot<60)why+=` Su puntuación es ${si.tot}/100, prioridad baja: valora si te compensa seguir o descartarlo.`;
+  return {step:s,why};
+}
+$("#btnWhatNow").addEventListener("click",()=>{
+  const w=whatNow(),box=$("#whatNow"),s=stepDef(w.step);
+  box.innerHTML=`<p><strong>Siguiente: paso ${w.step}, ${esc(s.title.toLowerCase())}.</strong> ${esc(w.why)}</p><div class="row-btns"><button type="button" class="btn primary" id="goWhat">Ir al paso ${w.step}</button>${w.crm?'<button type="button" class="btn" id="goCrm">Ver mis prospectos</button>':""}</div>`;
+  box.hidden=false;
+  $("#goWhat").onclick=()=>{box.hidden=true;if(w.pid)setActive(w.pid,true);goStep(w.step,true)};
+  if(w.crm)$("#goCrm").onclick=()=>{box.hidden=true;showView("prospectos",true)};
+  $("#goWhat").focus();
+});
+$("#stepper").addEventListener("click",e=>{const b=e.target.closest("[data-step]");if(b)goStep(+b.dataset.step,true)});
+
+/* ================= Fichas de prospectos (CRM) ================= */
+const doneCount=p=>[3,4,5,6,7,8,9,10].filter(n=>p.done[n]).length;
+function renderCRM(){
+  const sel=$("#crmEstado");
+  if(!sel.options.length)sel.innerHTML=`<option value="">Todos los estados</option>`+ESTADOS.map(e=>`<option>${e}</option>`).join("");
+  const q=norm($("#crmQ").value.trim()),est=sel.value,sort=$("#crmSort").value;
+  let list=store.prospects.filter(p=>(!est||p.estado===est)&&(!q||norm([pname(p),p.empresa.sector,fullName(p),p.contacto.cargo,p.notas,p.motivo].join(" ")).includes(q)));
+  const by={upd:(a,b)=>b.updated.localeCompare(a.updated),score:(a,b)=>{const x=scoreInfo(a),y=scoreInfo(b);return (y.n?y.tot:-1)-(x.n?x.tot:-1)},az:(a,b)=>pname(a).localeCompare(pname(b),"es"),estado:(a,b)=>ESTADOS.indexOf(a.estado)-ESTADOS.indexOf(b.estado)};
+  list.sort(by[sort]||by.upd);
+  $("#crmList").innerHTML=list.map((p,i)=>{
+    const si=scoreInfo(p),dc=doneCount(p),who=[fullName(p),p.contacto.cargo].filter(Boolean).join(", ");
+    return `<li><article class="pcard" data-eg="${egOf(p.estado)}" style="animation-delay:${Math.min(i*20,200)}ms" aria-labelledby="pc-${p.id}">
+      <div><h3 id="pc-${p.id}">${esc(pname(p))}${p.id===store.active?'<span class="is-activep">Activo</span>':""}</h3><p class="who">${who?esc(who):"Sin contacto identificado"}</p></div>
+      <div class="pc-meta"><span class="estado">${esc(p.estado)}</span><span>${si.n?`${si.tot}/100, prioridad ${si.prio}${si.n<6?" (provisional)":""}`:"Sin puntuar"}</span>
+        <span class="mini">${dc} de 8 pasos<span class="bar" aria-hidden="true"><i style="width:${dc/8*100}%"></i></span></span>
+        ${p.proxima?`<span class="pc-next">Próxima acción: ${esc(p.proxima)}${p.proximaFecha?`, ${esc(fmtDate(p.proximaFecha,false))}`:""}</span>`:""}</div>
+      <div class="card-actions"><button type="button" class="btn primary" data-cont="${p.id}">Continuar<span class="sr"> con ${esc(pname(p))}</span></button><button type="button" class="btn" data-card="${p.id}">Ver ficha<span class="sr"> de ${esc(pname(p))}</span></button></div>
+    </article></li>`}).join("");
+  const none=!list.length;
+  $("#crmList").hidden=none;$("#crmEmpty").hidden=!none;
+  if(none){
+    const any=store.prospects.length;
+    $("#crmEmptyTitle").textContent=any?"Sin resultados":"Aún no tienes prospectos";
+    $("#crmEmptyText").textContent=any?"Ningún prospecto coincide con la búsqueda o el estado elegido.":"Crea tu primer prospecto o registra empresas objetivo en el paso 2 de Mi sistema.";
+    $("#crmEmptyBtn").textContent=any?"Ver todos los prospectos":"Nuevo prospecto";
+  }
+  $("#crmStatus").textContent=none?"":`Mostrando ${list.length} de ${store.prospects.length} prospectos.`;
+}
+["input","change"].forEach(t=>{$("#crmQ").addEventListener(t,renderCRM);$("#crmEstado").addEventListener(t,renderCRM);$("#crmSort").addEventListener(t,renderCRM)});
+$("#crmEmptyBtn").addEventListener("click",e=>{
+  if(store.prospects.length){$("#crmQ").value="";$("#crmEstado").value="";renderCRM();$("#crmQ").focus()}else openPDialog(null,e.currentTarget);
+});
+$("#crmList").addEventListener("click",e=>{
+  const c=e.target.closest("[data-cont]"),f2=e.target.closest("[data-card]");
+  if(c){const p=pById(c.dataset.cont);setActive(p.id,true);store.ui.step=firstOpen(p)||10;showView("sistema",true);goStep(store.ui.step,true)}
+  else if(f2)openCard(f2.dataset.card,f2);
+});
+function setActive(id,quiet){
+  if(store.active===id)return;
+  store.active=id;save();renderShell();
+  if(!$("#view-sistema").hidden)renderSystem();
+  if(!$("#view-biblioteca").hidden)renderGrid();
+  if(!$("#view-prospectos").hidden)renderCRM();
+  if(!quiet&&id)toast("Prospecto activo: "+pname(pById(id)));
+}
+$("#selProspect").addEventListener("change",e=>setActive(e.target.value||null));
+
+/* Crear o editar prospecto */
+const dlgP=$("#dlgP");let editP=null,pOpener=null,pDone=null;
+function openPDialog(id,opener,after){
+  editP=id?pById(id):null;pOpener=opener||document.activeElement;pDone=after||null;
+  $("#pp-es").innerHTML=ESTADOS.map(e=>`<option>${e}</option>`).join("");
+  $$("[data-k]",dlgP).forEach(i=>{const[a,b]=i.dataset.k.split(".");i.value=editP?(b?(editP[a][b]||""):editP[a]):(a==="estado"?"Nuevo":"")});
+  $("#dpTitleP").textContent=editP?"Editar prospecto":"Nuevo prospecto";$("#pSubmit").textContent=editP?"Guardar cambios":"Crear prospecto";
+  $("#pErr").hidden=true;dlgP.showModal();$("#pp-en").focus();
+}
+$("#pCancel").addEventListener("click",()=>dlgP.close());
+$("#pForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  if(!$("#pp-en").value.trim()&&!$("#pp-cn").value.trim()){$("#pErr").textContent="Escribe al menos la empresa o el nombre del contacto.";$("#pErr").hidden=false;$("#pp-en").focus();return}
+  const p=editP||BLANKP();
+  $$("[data-k]",dlgP).forEach(i=>{const[a,b]=i.dataset.k.split("."),v=i.value.trim();if(b){if(v)p[a][b]=v;else delete p[a][b]}else p[a]=ESTADOS.includes(v)?v:"Nuevo"});
+  p.updated=nowISO();
+  if(!editP){store.prospects.unshift(p);store.active=p.id}
+  save();const wasEdit=!!editP;dlgP.close();renderAllViews();toast(wasEdit?"Prospecto actualizado":`Prospecto creado y activo: ${pname(p)}`);
+});
+dlgP.addEventListener("close",()=>{const fn=pDone;pDone=null;editP=null;if(fn)fn();else if(pOpener&&pOpener.isConnected)pOpener.focus();else $("#btnNewP").focus()});
+$("#btnNewP").addEventListener("click",e=>openPDialog(null,e.currentTarget));
+$("#btnNewP2").addEventListener("click",e=>openPDialog(null,e.currentTarget));
+
+/* Ficha completa */
+const dlgCard=$("#dlgCard");let cardId=null,cardOpener=null,cardNext=null;
+function openCard(id,opener){
+  const p=pById(id);if(!p)return;
+  cardId=id;if(opener)cardOpener=opener;
+  const si=scoreInfo(p),dl=fields=>{const r=fields.map(x=>{const v=(x.path.split(".").slice(1).reduce((o,k)=>o&&o[k],p)||"").trim();return v?`<dt>${esc(x.label)}</dt><dd>${esc(v)}</dd>`:""}).join("");return r?`<dl class="dl">${r}</dl>`:`<p class="muted">Sin datos todavía.</p>`};
+  const res=[3,4,5,6,7,8,9,10].flatMap(n=>stepDef(n).prompts.map(v=>({n,v,t:(p.results[n]||{})[v.id]||"",at:(p.savedAt[n]||{})[v.id]}))).filter(r=>r.t.trim());
+  $("#cardBox").innerHTML=`<div class="card-head"><div><h2 id="cardTitle">${esc(pname(p))}</h2><p class="hint">${esc([fullName(p),p.contacto.cargo].filter(Boolean).join(", ")||"Sin contacto identificado")}. Creado el ${esc(fmtDate(p.created,false))}.</p></div>
+    <div class="pf"><label for="cardEstado">Estado</label><select class="sel" id="cardEstado">${ESTADOS.map(e=>`<option${e===p.estado?" selected":""}>${e}</option>`).join("")}</select></div></div>
+    <div class="row start"><button type="button" class="btn primary" id="cardCont">Continuar en Mi sistema</button><button type="button" class="btn" id="cardEdit">Editar datos</button></div>
+    <section class="card-sec"><h3>Empresa</h3>${dl(fieldsOfStep(3))}</section>
+    <section class="card-sec"><h3>Contacto</h3>${dl(fieldsOfStep(4))}</section>
+    <section class="card-sec"><h3>Puntuación</h3>${si.n?`<p><strong>${si.tot}/100</strong>, prioridad ${si.prio}${si.n<6?`. Provisional: ${si.n} de 6 criterios valorados`:""}.</p>`:`<p class="muted">Sin puntuar. Hazlo en el paso 5.</p>`}${dl(fieldsOfStep(5).filter(x=>x.type!=="number"))}</section>
+    <section class="card-sec"><h3>Investigación, estrategia y mensajes guardados</h3>${res.length?res.map((r,i)=>`<details class="res-item"><summary>Paso ${r.n}. ${esc(stepDef(r.n).title)}${stepDef(r.n).prompts.length>1?`: ${esc(r.v.label)}`:""}${r.at?`<small>Guardado el ${esc(fmtDate(r.at))}</small>`:""}</summary><pre class="pv">${esc(r.t)}</pre><div class="pb-actions"><button type="button" class="btn" data-copyres="${i}">Copiar</button></div></details>`).join(""):`<p class="muted">Aún no has guardado respuestas de la IA para este prospecto.</p>`}</section>
+    <section class="card-sec"><h3>Próxima acción y notas</h3><div class="pf2"><div class="pf"><label for="cardProx">Próxima acción</label><input id="cardProx" type="text" autocomplete="off"></div><div class="pf"><label for="cardProxF">Fecha</label><input id="cardProxF" type="date"></div></div>
+      <div class="pf" style="margin-top:12px"><label for="cardNotas">Notas</label><textarea id="cardNotas" rows="5"></textarea></div></section>
+    <div class="row"><button type="button" class="link danger" id="cardDel">Eliminar prospecto</button><button type="button" class="btn primary" id="cardClose">Cerrar</button></div>`;
+  $("#cardProx").value=p.proxima;$("#cardProxF").value=p.proximaFecha;$("#cardNotas").value=p.notas;
+  const upd=(k,v)=>{p[k]=v;p.updated=nowISO();save()};
+  $("#cardEstado").onchange=e=>{upd("estado",e.target.value);renderShell();toast("Estado: "+e.target.value)};
+  $("#cardProx").oninput=e=>upd("proxima",e.target.value);$("#cardProxF").oninput=e=>upd("proximaFecha",e.target.value);$("#cardNotas").oninput=e=>upd("notas",e.target.value);
+  $$("[data-copyres]",dlgCard).forEach(b=>b.onclick=()=>copyText(res[+b.dataset.copyres].t,b,"Respuesta"));
+  $("#cardClose").onclick=()=>dlgCard.close();
+  $("#cardCont").onclick=()=>{cardNext=()=>{setActive(p.id,true);showView("sistema",true);goStep(firstOpen(p)||10,true)};dlgCard.close()};
+  $("#cardEdit").onclick=()=>{cardNext=()=>openPDialog(p.id,null,()=>openCard(p.id));dlgCard.close()};
+  $("#cardDel").onclick=()=>ask("¿Eliminar este prospecto?",`Se borrarán la ficha de «${pname(p)}», su investigación, puntuación, estrategia y respuestas guardadas. Esta acción no se puede deshacer.`,"Sí, eliminar",()=>{
+    store.prospects=store.prospects.filter(x=>x!==p);
+    if(store.active===p.id)store.active=store.prospects[0]?store.prospects[0].id:null;
+    save();cardOpener=null;dlgCard.close();renderAllViews();toast("Prospecto eliminado");$("#btnNewP2").focus();
+  });
+  if(!dlgCard.open)dlgCard.showModal();
+  $("#cardEstado").focus();
+}
+dlgCard.addEventListener("close",()=>{
+  const fn=cardNext;cardNext=null;
+  if(!$("#view-prospectos").hidden)renderCRM();
+  if(fn){fn();return}
+  const o=cardOpener;cardOpener=null;
+  const again=o&&o.dataset&&o.dataset.card&&$(`[data-card="${o.dataset.card}"]`);
+  if(again)again.focus();else if(o&&o.isConnected)o.focus();
+});
+
+const ROUTES=[
+  {name:"Primer email",desc:"De la investigación a un email revisado",ids:[1,2,3,4,5,20]},
+  {name:"Llamada en frío",desc:"Del perfil al guion y al registro",ids:[1,2,4,8,10,18]},
+  {name:"Reunión de descubrimiento",desc:"Llegar preparado y dejar constancia",ids:[14,12,17,18]}
+];
+
+/* Campos: se detectan por corchetes. ROWS indica cuáles son de texto largo. */
+const RX=/\[([^\[\]\n]+)\]/g;
+const IGNORE=new Set(); /* marcadores que serían formato de salida y no datos: ninguno en esta biblioteca */
+/* Campos de la biblioteca que se completan con Mi negocio (paso 1) o con el prospecto activo. */
+const SHARED={"Mi nombre":"business.nombre","Mi empresa":"business.empresa","Mi producto o servicio":"business.producto","Propuesta de valor":"business.propuesta","Mi teléfono":"business.telefono",
+  "Nombre del prospecto":"p.@full","Nombre del contacto":"p.@full","Cargo":"p.contacto.cargo","Empresa del prospecto":"p.empresa.nombre","Empresa":"p.empresa.nombre","Nombre de la empresa":"p.empresa.nombre",
+  "URL de LinkedIn":"p.contacto.linkedin","URL del perfil de LinkedIn":"p.contacto.linkedin","URL de la empresa":"p.empresa.web"};
+const isPKey=k=>(SHARED[k]||"").startsWith("p.");
+function sharedVal(key){const path=SHARED[key];if(!path)return "";if(path==="p.@full")return fullName(activeP());const v=getV(path);return typeof v==="string"?v:""}
+function setShared(key,val){
+  const path=SHARED[key];ensureP();
+  if(path==="p.@full"){const c=activeP().contacto;if(val.trim())c.nombre=val;else delete c.nombre;delete c.apellidos;activeP().updated=nowISO();return}
+  setV(path,val.trim()?val:"");
+}
+const usedMap=()=>{const p=activeP();return p?p.used:store.used};
+const ROWS={"Propuesta de valor":3,"Notas del CRM":8,"Información, URL o publicaciones del prospecto":5,"Email a editar":7,"Línea a mejorar":3,
+  "Información adicional del prospecto o empresa":5,"Email a recortar":7,"Punto de dolor identificado":3,"Información de LinkedIn o de la empresa":5,
+  "Prioridades del prospecto":3,"Email inicial":7,"Nuevo valor disponible":3,"Personas identificadas y sus cargos":4,"Información de la empresa":5,
+  "Información del perfil o publicación reciente":5,"Mensajes anteriores":7,"Contexto disponible":5,"Notas o transcripción de la llamada":9,
+  "Último punto de la conversación":3,"Motivo de la pausa":3,"Novedad disponible":3,"Mensaje a revisar":8,"Información verificada del prospecto":5};
+const LONG=/email|notas|informaci|contexto|mensaje|texto|transcrip|hilo|descrip|detalle/i;
+const rowsOf=k=>ROWS[k]||(!SHARED[k]&&LONG.test(k)?5:0);
 let filter="todos",query="",current=null,view="custom",openerSel=null,fMode="sit",fStage=null,fSit=null;
 
 const all=()=>PROMPTS.concat(store.own);
@@ -1190,7 +2323,7 @@ const byId=id=>all().find(p=>String(p.id)===String(id));
 const isOwn=p=>typeof p.id==="string";
 const numOf=p=>isOwn(p)?PROMPTS.length+1+store.own.indexOf(p):p.id;
 const isFav=p=>store.favs.includes(String(p.id));
-const isUsed=p=>!!store.used[p.id];
+const isUsed=p=>!!usedMap()[p.id];
 
 function optionOf(p){
   if(!p.options)return null;
@@ -1206,7 +2339,6 @@ function fieldsOf(text){
   for(const m of text.matchAll(RX)){if(!IGNORE.has(m[1])&&!out.includes(m[1]))out.push(m[1])}
   return out;
 }
-const sharedVal=key=>SRC[key]?(store[SRC[key][0]][SRC[key][1]]||""):"";
 function valueOf(p,key){
   const v=(store.custom[p.id]&&store.custom[p.id].values)||{};
   return has(v,key)?v[key]:sharedVal(key);
@@ -1237,16 +2369,6 @@ function applyTheme(){
   $("#themeIcon").setAttribute("d",d?"M12 3v2M12 19v2M3 12h2M19 12h2M5.600 5.600l1.400 1.400M17 17l1.400 1.400M5.600 18.400 7 17M17 7l1.400-1.400M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z":"M20 14.500A8 8 0 0 1 9.500 4 8 8 0 1 0 20 14.500z");
 }
 $("#btnTheme").addEventListener("click",()=>{store.theme=isDark()?"light":"dark";save();applyTheme();toast(store.theme==="dark"?"Tema oscuro activado":"Tema claro activado")});
-
-/* ================= Fichas de contexto ================= */
-function renderCtx(){
-  const p=store.prospect,who=[p.nombre,p.cargo].filter(v=>v&&v.trim()).join(", ");
-  const txt=who&&p.empresa?who+" en "+p.empresa:(who||p.empresa||"");
-  $("#ctxProspect").textContent=txt.trim()||"Sin definir";
-  const f=store.profile,n=Object.values(f).filter(v=>v&&v.trim()).length;
-  $("#ctxProfile").textContent=n?([f.nombre,f.empresa].filter(v=>v&&v.trim()).join(", ")||n+" de 5 datos"):"Sin rellenar";
-  $("#total").textContent=all().length;
-}
 
 /* ================= Listado ================= */
 function filterList(){
@@ -1308,7 +2430,7 @@ function renderGrid(){
 }
 function setFilter(id){filter=id;renderFilters();renderGrid()}
 function clearAll(){query="";$("#q").value="";setFilter("todos");$("#q").focus()}
-function renderAll(){applyTheme();renderCtx();renderFilters();renderGrid();renderFinder()}
+
 
 function toggleFav(id,btn){
   id=String(id);
@@ -1344,7 +2466,7 @@ function legacyCopy(text){
 }
 function markUsed(p){
   if(isUsed(p))return;
-  store.used[p.id]=true;save();
+  usedMap()[p.id]=true;save();
   $$(`[data-used="${p.id}"]`).forEach(e=>e.hidden=false);
   if(current===p)$("#dpUsed").hidden=false;
   if(fMode==="routes"&&!$("#finderBody").contains(document.activeElement))renderFinder();
@@ -1444,19 +2566,19 @@ function renderFields(){
     const rows=rowsOf(k),id=`f-${p.id}-${optionOf(p)?optionOf(p).id+"-":""}${i}`;
     const ctl=rows?`<textarea id="${id}" rows="${rows}"></textarea>`:`<input id="${id}" type="text" autocomplete="off">`;
     return `<div class="field"><label for="${id}">${esc(k)}</label>${ctl}
-      <div class="field-meta"><span class="from-shared" hidden></span><button type="button" class="link" data-useprofile hidden>Volver al valor de mi perfil</button></div></div>`;
+      <div class="field-meta"><span class="from-shared" hidden></span><button type="button" class="link" data-useprofile hidden>Volver al valor de Mi negocio</button></div></div>`;
   }).join("");
   $$(".field",form).forEach((f,i)=>{
     const ctl=$("input,textarea",f);ctl.dataset.key=keys[i];ctl.value=valueOf(p,keys[i]);syncMeta(f);
   });
 }
 function syncMeta(f){
-  const ctl=$("input,textarea",f),key=ctl.dataset.key,src=SRC[key];
-  if(!src)return;
+  const ctl=$("input,textarea",f),key=ctl.dataset.key;
+  if(!SHARED[key])return;
   const note=$(".from-shared",f),back=$("[data-useprofile]",f);
-  if(src[0]==="prospect"){note.hidden=false;note.textContent="Ficha del prospecto: se reutiliza en los demás prompts.";back.hidden=true;return}
+  if(isPKey(key)){note.hidden=false;note.textContent="Ficha del prospecto activo: se reutiliza en Mi sistema y en los demás prompts.";back.hidden=true;return}
   const prof=sharedVal(key),v=(store.custom[current.id]&&store.custom[current.id].values)||{},over=has(v,key);
-  note.textContent="Completado desde tu perfil. Puedes cambiarlo aquí.";
+  note.textContent="Completado desde Mi negocio. Puedes cambiarlo aquí.";
   note.hidden=over||!prof;back.hidden=!(over&&prof&&v[key]!==prof);
 }
 function renderPreview(){
@@ -1472,11 +2594,9 @@ const custom=p=>store.custom[p.id]||(store.custom[p.id]={});
 
 $("#dpForm").addEventListener("input",e=>{
   const ctl=e.target,key=ctl.dataset.key;if(!key)return;
-  const c=custom(current),vals=c.values||(c.values={}),src=SRC[key];
-  if(src&&src[0]==="prospect"){
-    if(ctl.value.trim())store.prospect[src[1]]=ctl.value;else delete store.prospect[src[1]];
-    delete vals[key];renderCtx();
-  }else if(ctl.value===sharedVal(key))delete vals[key];
+  const c=custom(current),vals=c.values||(c.values={});
+  if(isPKey(key)){setShared(key,ctl.value);delete vals[key];renderShell()}
+  else if(ctl.value===sharedVal(key))delete vals[key];
   else vals[key]=ctl.value;
   save();syncMeta(ctl.closest(".field"));
   view="custom";renderPreview();
@@ -1540,7 +2660,7 @@ $("#ownForm").addEventListener("submit",e=>{
   let p=editing;
   if(p){const i=store.own.indexOf(p);p=store.own[i]={id:p.id,...data}}
   else{p={id:"c"+Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36),...data};store.own.push(p)}
-  save();ownSaved=p.id;renderCtx();renderFilters();renderGrid();
+  save();ownSaved=p.id;renderShell();renderFilters();renderGrid();
   dlgOwn.close();toast(editing?"Prompt actualizado":"Prompt añadido a tu biblioteca");
 });
 dlgOwn.addEventListener("close",()=>{
@@ -1555,62 +2675,8 @@ $("#dpFork").addEventListener("click",()=>{
 $("#dpDelete").addEventListener("click",()=>{
   const p=current;
   ask("¿Eliminar este prompt?",`«${p.title}» desaparecerá de tu biblioteca. Esta acción no se puede deshacer.`,"Sí, eliminar",()=>{
-    store.own=store.own.filter(x=>x!==p);store.favs=store.favs.filter(f=>f!==p.id);delete store.custom[p.id];delete store.used[p.id];
-    save();openerSel=null;dlg.close();renderCtx();renderFilters();renderGrid();toast("Prompt eliminado");
-  });
-});
-
-/* ================= Fichas: prospecto y perfil ================= */
-function bindSheet(dlgSel,formSel,btnSel,bucket,doneMsg){
-  const d=$(dlgSel);
-  $(btnSel).addEventListener("click",()=>{$$("[data-k]",d).forEach(i=>i.value=store[bucket][i.dataset.k]||"");d.showModal()});
-  $(formSel).addEventListener("input",e=>{
-    const k=e.target.dataset.k;if(!k)return;
-    if(e.target.value.trim())store[bucket][k]=e.target.value;else delete store[bucket][k];
-    save();renderCtx();
-  });
-  $(formSel).addEventListener("submit",e=>{e.preventDefault();d.close();toast(doneMsg)});
-  d.addEventListener("close",()=>$(btnSel).focus());
-}
-bindSheet("#dlgProfile","#pfForm","#btnProfile","profile","Perfil guardado en este navegador");
-bindSheet("#dlgProspect","#psForm","#btnProspect","prospect","Ficha del prospecto guardada");
-$("#psNew").addEventListener("click",()=>{
-  ask("¿Empezar con otro prospecto?","Se vaciarán la ficha del prospecto, los campos rellenados en los prompts y las marcas de «Usado». Tu perfil, tus favoritos y tus prompts propios se conservan.","Sí, empezar de nuevo",()=>{
-    store.prospect={};store.used={};
-    for(const c of Object.values(store.custom))delete c.values;
-    save();$$("[data-k]",$("#dlgProspect")).forEach(i=>i.value="");
-    renderCtx();renderGrid();renderFinder();$("#ps-nombre").focus();toast("Listo para un nuevo prospecto");
-  });
-});
-
-/* ================= Copia de seguridad ================= */
-const dlgBackup=$("#dlgBackup");
-$("#btnBackup").addEventListener("click",()=>{
-  $("#bkOut").value=JSON.stringify({app:"prospeccion-ia",v:1,...store});
-  $("#bkIn").value="";$("#bkErr").hidden=true;dlgBackup.showModal();
-});
-$("#bkCopy").addEventListener("click",e=>copyText($("#bkOut").value,e.currentTarget,"Copia de seguridad"));
-$("#bkClose").addEventListener("click",()=>dlgBackup.close());
-$("#bkImport").addEventListener("click",()=>{
-  const err=$("#bkErr");let data=null;
-  try{data=JSON.parse($("#bkIn").value.trim())}catch(e){}
-  if(!data||typeof data!=="object"||data.app!=="prospeccion-ia"){
-    err.textContent=$("#bkIn").value.trim()?"Ese texto no es una copia de seguridad de este panel. Pégalo completo, tal como lo copiaste.":"Pega primero el texto de la copia de seguridad.";
-    err.hidden=false;$("#bkIn").focus();return;
-  }
-  err.hidden=true;
-  ask("¿Recuperar esta copia?","Sustituirá los favoritos, las fichas, los prompts propios y los campos guardados ahora en este navegador.","Sí, recuperar",()=>{
-    store=migrate(sanitize(data));save();filter="todos";renderAll();dlgBackup.close();toast("Copia de seguridad recuperada");
-  });
-});
-dlgBackup.addEventListener("close",()=>$("#btnBackup").focus());
-
-/* ================= Borrado ================= */
-$("#btnWipe").addEventListener("click",()=>{
-  ask("¿Borrar los datos guardados?","Se eliminarán tus favoritos, tu perfil, la ficha del prospecto, tus prompts propios y los campos que hayas rellenado en este navegador. Esta acción no se puede deshacer.","Sí, borrar todo",()=>{
-    store=blank();
-    try{localStorage.removeItem(KEY)}catch(e){}
-    filter="todos";renderAll();toast("Datos guardados borrados");
+    store.own=store.own.filter(x=>x!==p);store.favs=store.favs.filter(f=>f!==p.id);delete store.custom[p.id];store.prospects.forEach(x=>delete x.used[p.id]);delete store.used[p.id];
+    save();openerSel=null;dlg.close();renderShell();renderFilters();renderGrid();toast("Prompt eliminado");
   });
 });
 
@@ -1647,12 +2713,12 @@ function renderFinder(){
     h=`<p class="fstep"><b>1</b>Elige un recorrido</p><div class="stage-list">${ROUTES.map((x,i)=>
       `<button type="button" class="stage" data-route="${i}" aria-pressed="${i===store.route}"><strong>${x.name}</strong><span>${x.desc}. ${x.ids.length} pasos.</span></button>`).join("")}</div>`;
     if(r){
-      const done=r.ids.filter(id=>store.used[id]).length;
+      const done=r.ids.filter(id=>usedMap()[id]).length;
       status=`Recorrido ${r.name}: ${done} de ${r.ids.length} pasos hechos.`;
-      h+=`<div class="fpart"><p class="fstep"><b>2</b>Sigue los pasos en orden</p><ol class="route-steps">${r.ids.map((id,i)=>{const p=byId(id),u=!!store.used[id];return `<li class="${u?"is-used":""}">
+      h+=`<div class="fpart"><p class="fstep"><b>2</b>Sigue los pasos en orden</p><ol class="route-steps">${r.ids.map((id,i)=>{const p=byId(id),u=!!usedMap()[id];return `<li class="${u?"is-used":""}">
         <span class="dot" aria-hidden="true">${u?"✓":i+1}</span>
         <span class="t"><span class="sr">Paso ${i+1}${u?", hecho":""}: </span>${esc(p.title)}<small>${CATS[p.cat]}, prompt ${id}</small></span>
-        <button type="button" class="btn${!u&&r.ids.slice(0,i).every(x=>store.used[x])?" primary":""}" data-open="${id}">Abrir<span class="sr">: ${esc(p.title)}</span></button></li>`}).join("")}</ol>
+        <button type="button" class="btn${!u&&r.ids.slice(0,i).every(x=>usedMap()[x])?" primary":""}" data-open="${id}">Abrir<span class="sr">: ${esc(p.title)}</span></button></li>`}).join("")}</ol>
         <div class="route-foot"><span>${done} de ${r.ids.length} pasos hechos</span><span class="bar" aria-hidden="true"><i style="width:${Math.round(done/r.ids.length*100)}%"></i></span><button type="button" class="link" data-routeoff>Salir del recorrido</button></div></div>`;
     }
   }
@@ -1688,11 +2754,88 @@ $("#grid").addEventListener("click",e=>{
 document.addEventListener("keydown",e=>{
   if(e.key!=="/"||e.ctrlKey||e.metaKey||e.altKey||$("dialog[open]"))return;
   if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;
-  e.preventDefault();$("#q").focus();
+  e.preventDefault();if($("#view-biblioteca").hidden)showView("biblioteca",true);$("#q").focus();
 });
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change",applyTheme);
 
-renderAll();$("#storageNote").hidden=storageOK;
+
+
+/* ================= Estructura general ================= */
+function renderShell(){
+  $("#nProspects").textContent=store.prospects.length;
+  $("#nPrompts").textContent=all().length;$("#total").textContent=all().length;
+  const sel=$("#selProspect");
+  sel.innerHTML=store.prospects.length?(store.active?"":`<option value="">Elige un prospecto</option>`)+store.prospects.map(p=>`<option value="${p.id}"${p.id===store.active?" selected":""}>${esc(pname(p))}${fullName(p)&&p.empresa.nombre?", "+esc(fullName(p)):""}</option>`).join(""):`<option value="">Aún no hay prospectos</option>`;
+  sel.disabled=!store.prospects.length;
+}
+const VIEWS=["sistema","prospectos","biblioteca"];
+function showView(v,setHash){
+  if(!VIEWS.includes(v))v="sistema";
+  store.ui.view=v;save();
+  VIEWS.forEach(x=>$("#view-"+x).hidden=x!==v);
+  $$(".tab").forEach(t=>{if(t.dataset.view===v)t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
+  if(setHash&&location.hash!=="#"+v){try{history.replaceState(null,"","#"+v)}catch(e){}}
+  if(v==="sistema")renderSystem();else if(v==="prospectos")renderCRM();else{renderFilters();renderGrid();renderFinder()}
+}
+function renderAllViews(){applyTheme();renderShell();showView(store.ui.view,false)}
+$$(".tab").forEach(t=>t.addEventListener("click",e=>{e.preventDefault();showView(t.dataset.view,true);$("#main").scrollIntoView({block:"start"});t.focus()}));
+addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(VIEWS.includes(h))showView(h,false)});
+
+/* ================= Copia de seguridad ================= */
+const dlgBackup=$("#dlgBackup");
+const exportText=()=>JSON.stringify({app:"prospeccion-ia",exportedAt:nowISO(),...store});
+$("#btnBackup").addEventListener("click",()=>{
+  const kb=Math.max(1,Math.round(new Blob([JSON.stringify(store)]).size/1024));
+  $("#bkSize").textContent=`Ahora mismo tienes ${store.prospects.length} ${store.prospects.length===1?"prospecto":"prospectos"} y ${kb} KB de datos guardados${backend==="idb"?"":backend==="ls"?" (almacenamiento básico del navegador, limitado a unos 5 MB)":" (sin guardar: este navegador no lo permite)"}.`;
+  $("#bkIn").value="";$("#bkFile").value="";$("#bkErr").hidden=true;dlgBackup.showModal();
+});
+$("#bkCopy").addEventListener("click",e=>copyText(exportText(),e.currentTarget,"Copia de seguridad"));
+$("#bkDownload").addEventListener("click",()=>{
+  try{
+    const url=URL.createObjectURL(new Blob([exportText()],{type:"application/json"})),a=document.createElement("a");
+    a.href=url;a.download=`prospeccion-ia-copia-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),4000);
+    toast("Descargando la copia. Si no aparece, usa «Copiar como texto».");
+  }catch(e){toast("No se pudo descargar. Usa «Copiar como texto».")}
+});
+function importText(t){
+  const err=$("#bkErr");let data=null;
+  try{data=JSON.parse(t.trim())}catch(e){}
+  if(!data||typeof data!=="object"||data.app!=="prospeccion-ia"){
+    err.textContent=t.trim()?"Ese contenido no es una copia de seguridad de este panel. Usa el archivo descargado o pega el texto completo, tal como lo copiaste.":"Elige un archivo o pega primero el texto de la copia.";
+    err.hidden=false;$("#bkIn").focus();return;
+  }
+  err.hidden=true;
+  ask("¿Recuperar esta copia?","Sustituirá todo lo guardado ahora en este navegador: tu negocio, tus prospectos, favoritos, prompts propios y respuestas.","Sí, recuperar",async()=>{
+    store=normalize(data);await flush();filter="todos";renderAllViews();dlgBackup.close();toast("Copia de seguridad recuperada");
+  });
+}
+$("#bkImport").addEventListener("click",()=>importText($("#bkIn").value));
+$("#bkFile").addEventListener("change",e=>{
+  const file=e.target.files&&e.target.files[0];if(!file)return;
+  if(file.size>30*1024*1024){$("#bkErr").textContent="El archivo es demasiado grande para ser una copia de este panel.";$("#bkErr").hidden=false;return}
+  const r=new FileReader();r.onload=()=>importText(String(r.result||""));r.onerror=()=>{$("#bkErr").textContent="No se pudo leer el archivo. Prueba a pegar su contenido.";$("#bkErr").hidden=false};r.readAsText(file);
+});
+$("#bkClose").addEventListener("click",()=>dlgBackup.close());
+dlgBackup.addEventListener("close",()=>$("#btnBackup").focus());
+
+/* ================= Borrado ================= */
+$("#btnWipe").addEventListener("click",()=>{
+  ask("¿Borrar los datos guardados?","Se eliminarán tu negocio, tus prospectos con su investigación y respuestas, tus favoritos, tus prompts propios y los campos rellenados en este navegador. Esta acción no se puede deshacer. Si quieres conservarlos, descarga antes una copia de seguridad.","Sí, borrar todo",async()=>{
+    store=blank();
+    try{localStorage.removeItem(LS1);localStorage.removeItem(LS2)}catch(e){}
+    await flush();filter="todos";renderAllViews();toast("Datos guardados borrados");
+  });
+});
+
+/* ================= Inicio ================= */
+(async()=>{
+  await loadStore();
+  const h=location.hash.slice(1);if(VIEWS.includes(h))store.ui.view=h;
+  renderAllViews();
+  if(backend==="none")setSaveError("");
+})();
+
 
 </script>
 </body>
