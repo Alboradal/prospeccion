@@ -559,6 +559,30 @@ ol.glist{list-style:decimal}
 .gnav .chip[aria-pressed="true"] b{background:transparent;color:inherit}
 .gpager{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
 @media (max-width:520px){.gpager .btn{flex:1 1 100%}}
+/* ===== Facilidad de uso ===== */
+.simple .adv,.simple #btnAdd,.simple .filters2{display:none!important}
+.simple-only{display:none}
+.simple .simple-only{display:block}
+.simple-note{padding:10px 14px;border-radius:10px;background:var(--surface-2);font-size:.93rem;color:var(--muted)}
+.top-bar{gap:8px}
+.btn.switch{gap:10px;font-size:.92rem}
+.btn.switch .sw{width:34px;height:20px;border-radius:99px;background:var(--line-strong);position:relative;transition:background .2s;flex:none}
+.btn.switch .sw::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:var(--surface);transition:transform .2s}
+.btn.switch[aria-pressed="true"] .sw{background:var(--accent)}
+.btn.switch[aria-pressed="true"] .sw::after{transform:translateX(14px)}
+.lblrow{display:flex;align-items:center;gap:6px}
+.qmark{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;border:1px solid var(--line-strong);background:var(--surface);color:var(--accent-strong);font-weight:700;font-size:.8rem;line-height:1;padding:0;vertical-align:middle;flex:none;position:relative}
+.qmark::after{content:"";position:absolute;inset:-10px}
+.qmark:hover{background:var(--accent-soft);border-color:var(--accent)}
+.active-p .qmark{margin-left:-4px}
+.ex summary{cursor:pointer;color:var(--accent-strong);font-size:.88rem;font-weight:600;min-height:32px;display:flex;align-items:center;width:max-content}
+.ex p{font-size:.9rem;color:var(--muted);padding:8px 12px;border-left:3px solid var(--accent-soft);background:var(--surface-2);border-radius:0 8px 8px 0}
+.cycle{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));counter-reset:none}
+.cycle li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--surface);border:1px solid var(--line);font-size:.92rem;font-weight:600}
+.cycle b{flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-size:.82rem}
+.btn.paste{align-self:flex-start;margin:4px 0}
+.bk-remind{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:14px;padding:14px 16px;border-radius:12px;border:1px solid color-mix(in srgb,var(--cat-bon) 45%,transparent);background:color-mix(in srgb,var(--cat-bon) 10%,var(--surface))}
+.bk-remind p{flex:1 1 320px}
 </style>
 </head>
 <body>
@@ -566,6 +590,7 @@ ol.glist{list-style:decimal}
 <header class="top">
   <div class="wrap">
     <div class="top-bar">
+      <button class="btn switch" id="btnSimple" type="button" aria-pressed="true"><span class="sw" aria-hidden="true"></span>Modo sencillo</button>
       <button class="iconbtn" id="btnTheme" type="button" aria-label="Cambiar a tema oscuro">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path id="themeIcon" d="M20 14.500A8 8 0 0 1 9.500 4 8 8 0 1 0 20 14.500z"/></svg>
       </button>
@@ -591,18 +616,19 @@ ol.glist{list-style:decimal}
     <div class="tabs">
       <a class="tab" href="#sistema" data-view="sistema">Mi sistema</a>
       <a class="tab" href="#panel" data-view="panel">Panel <b id="nTasks" title="Acciones para hoy o vencidas">0</b></a>
-      <a class="tab" href="#prospectos" data-view="prospectos">Prospectos <b id="nProspects">0</b></a>
+      <a class="tab" href="#prospectos" data-view="prospectos">Empresas <b id="nProspects">0</b></a>
       <a class="tab" href="#biblioteca" data-view="biblioteca">Biblioteca <b id="nPrompts">20</b></a>
       <a class="tab" href="#guia" data-view="guia">Guía</a>
     </div>
     <div class="active-p">
-      <label for="selProspect">Prospecto activo</label>
+      <label for="selProspect">Empresa activa</label><button type="button" class="qmark" data-term="Empresa activa" aria-label="¿Qué significa «Empresa activa»?">?</button>
       <select class="sel" id="selProspect"></select>
-      <button class="btn" id="btnNewP" type="button">Nuevo prospecto</button>
+      <button class="btn" id="btnNewP" type="button">Nueva empresa</button>
     </div>
   </div>
 </nav>
 
+<div class="wrap"><div class="bk-remind" id="bkRemind" role="status" hidden></div></div>
 <main id="main">
   <section class="view" id="view-sistema" aria-labelledby="sysH">
     <div class="wrap">
@@ -627,7 +653,7 @@ ol.glist{list-style:decimal}
           <h2 id="panH">Panel de control comercial</h2>
           <p class="muted">Tus próximas acciones, tu actividad y tus resultados, calculados solo con lo que registras aquí.</p>
         </div>
-        <div class="row-btns"><button class="btn" id="btnPanelTask" type="button">Nueva acción</button><button class="btn primary" id="btnPanelInt" type="button">Registrar interacción</button></div>
+        <div class="row-btns"><button class="btn" id="btnPanelTask" type="button">Nueva acción</button><button class="btn primary" id="btnPanelInt" type="button">Apuntar un contacto</button></div>
       </div>
       <div id="panelBody"></div>
     </div>
@@ -637,10 +663,10 @@ ol.glist{list-style:decimal}
     <div class="wrap">
       <div class="sys-head">
         <div>
-          <h2 id="crmH">Fichas de prospectos</h2>
+          <h2 id="crmH">Fichas de empresas</h2>
           <p class="muted">Datos, investigación, puntuación, estrategia y estado de cada prospecto. Elige uno para seguir trabajando con él en Mi sistema.</p>
         </div>
-        <button class="btn primary" id="btnNewP2" type="button">Nuevo prospecto</button>
+        <button class="btn primary" id="btnNewP2" type="button">Nueva empresa</button>
       </div>
       <div class="crm-tools">
         <div class="search">
@@ -833,7 +859,7 @@ ol.glist{list-style:decimal}
 
 <dialog id="dlgP" class="small" aria-labelledby="dpTitleP">
   <form class="box" id="pForm" novalidate>
-    <h2 id="dpTitleP">Nuevo prospecto</h2>
+    <h2 id="dpTitleP">Nueva empresa</h2>
     <p class="hint">Basta con la empresa o el nombre del contacto. El resto lo completarás en los pasos 3 y 4.</p>
     <div class="pf"><label for="pp-en">Empresa</label><input id="pp-en" data-k="empresa.nombre" type="text" autocomplete="off"></div>
     <div class="pf"><label for="pp-ew">Web de la empresa</label><input id="pp-ew" data-k="empresa.web" type="url" autocomplete="off" placeholder="https://"></div>
@@ -849,13 +875,13 @@ ol.glist{list-style:decimal}
     </div>
     <div class="pf"><label for="pp-es">Estado</label><select class="sel" id="pp-es" data-k="estado"></select></div>
     <p class="err" id="pErr" role="alert" hidden></p>
-    <div class="row"><button class="btn" id="pCancel" type="button">Cancelar</button><button class="btn primary" type="submit" id="pSubmit">Crear prospecto</button></div>
+    <div class="row"><button class="btn" id="pCancel" type="button">Cancelar</button><button class="btn primary" type="submit" id="pSubmit">Crear empresa</button></div>
   </form>
 </dialog>
 
 <dialog id="dlgInt" class="small" aria-labelledby="inTitle">
   <form class="box" id="intForm" novalidate>
-    <h2 id="inTitle">Registrar interacción</h2>
+    <h2 id="inTitle">Apuntar un contacto <button type="button" class="qmark" data-term="Interacción" aria-label="¿Qué significa «Interacción»?">?</button></h2>
     <p class="hint">Apunta cada email, mensaje, llamada o reunión. Con esto se calculan tus métricas y se actualiza el estado del prospecto.</p>
     <div class="pf"><label for="in-p">Prospecto</label><select class="sel" id="in-p"></select></div>
     <div class="pf2">
@@ -903,6 +929,14 @@ ol.glist{list-style:decimal}
       <button class="btn" type="submit">Añadir</button>
     </form>
     <div class="row"><button type="button" class="btn primary" id="objClose">Cerrar</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlgTerm" class="small" aria-labelledby="termTitle" aria-describedby="termText">
+  <div class="box">
+    <h2 id="termTitle"></h2>
+    <p id="termText"></p>
+    <div class="row"><button type="button" class="link" id="termGlos">Ver el glosario completo</button><button type="button" class="btn primary" id="termClose">Entendido</button></div>
   </div>
 </dialog>
 
@@ -1543,7 +1577,7 @@ const CRIT=[["icp","Encaje con el cliente ideal",25],["necesidad","Necesidad pot
 
 const BLANKP=()=>({id:uid("p"),created:nowISO(),updated:nowISO(),estado:"Nuevo",afinidad:"",motivo:"",empresa:{},contacto:{},score:{},notas:"",proxima:"",proximaFecha:"",inputs:{},results:{},savedAt:{},done:{},touched:{},used:{}});
 function blank(){return {schema:3,tasks:[],interactions:[],objCustom:[],objAnswers:{},toolInputs:{},favs:[],custom:{},own:[],used:{},theme:null,route:null,business:{},icp:{},
-  sys:{results:{},savedAt:{},done:{},touched:{}},prospects:[],active:null,ui:{view:"sistema",step:1,variants:{}}}}
+  sys:{results:{},savedAt:{},done:{},touched:{}},prospects:[],active:null,ui:{view:"sistema",step:1,variants:{},simple:true,firstUse:nowISO(),lastBackup:"",snooze:""}}}
 
 function sanCustom(v){
   const out={};
@@ -1592,7 +1626,7 @@ function sanitize2(o){
   s.tasks=sanTasks(o.tasks).map(t=>{if(!ids.has(t.pid))t.pid="";return t});
   s.active=s.prospects.some(p=>p.id===o.active)?o.active:(s.prospects[0]?s.prospects[0].id:null);
   const ui=obj(o.ui);
-  s.ui={view:["sistema","panel","prospectos","biblioteca","guia"].includes(ui.view)?ui.view:"sistema",step:Number.isInteger(ui.step)&&ui.step>=1&&ui.step<=10?ui.step:1,variants:flat(ui.variants,20),tourDone:ui.tourDone===true};
+  s.ui={view:["sistema","panel","prospectos","biblioteca","guia"].includes(ui.view)?ui.view:"sistema",step:Number.isInteger(ui.step)&&ui.step>=1&&ui.step<=10?ui.step:1,variants:flat(ui.variants,20),tourDone:ui.tourDone===true,simple:ui.simple===true,firstUse:str(ui.firstUse,40)||nowISO(),lastBackup:str(ui.lastBackup,40),snooze:str(ui.snooze,40)};
   return s;
 }
 /* Datos de la versión anterior (una sola ficha de prospecto y un perfil de 5 campos). */
@@ -1645,6 +1679,7 @@ async function loadStore(){
   if(!raw){const t=lsGet(LS2)||lsGet(LS1);if(t){try{raw=JSON.parse(t);from="ls"}catch(e){corrupt=true}}}
   if(!db){try{localStorage.setItem(LS2+":t","1");localStorage.removeItem(LS2+":t");backend="ls"}catch(e){backend="none"}}
   store=normalize(raw);
+  if(!raw)store.ui.simple=true;
   if(raw&&(from!=="idb"||raw.schema!==3))await flush();
   setSaveError(corrupt?"corrupt":"");
 }
@@ -2029,7 +2064,7 @@ ${RULES}`}}]},
 
 {n:10,scope:"p",title:"Conseguir la reunión y medir resultados",short:"Reunión",
  purpose:"Prepara la reunión comercial y registra cómo ha ido para mantener al día la ficha del prospecto.",
- help:["Indica fecha, duración y asistentes si ya los conoces.","Después de la reunión, actualiza el estado y apunta la próxima acción.","Registra cada email, llamada o reunión con «Registrar interacción»: así se alimentan el Panel y sus métricas."],
+ help:["Indica fecha, duración y asistentes si ya los conoces.","Después de la reunión, actualiza el estado y apunta la próxima acción.","Registra cada email, llamada o reunión con «Apuntar un contacto»: así se alimentan el Panel y sus métricas."],
  groups:[],
  needs:[["r:3","investigación de la empresa (paso 3)"],["r:6","estrategia comercial (paso 6)"]],
  prompts:[{id:"reu",label:"Preparar la reunión",fields:[f("p.inputs.fechaReunion","Fecha de la reunión",{type:"date"}),f("p.inputs.durReunion","Duración",{ph:"Por ejemplo: 30 minutos"}),f("p.inputs.asistentes","Asistentes",{ph:"Nombres y cargos, si los sabes"})],
@@ -2138,7 +2173,7 @@ function fieldHTML(x){
   const id=ctlId(x.path),hint=x.hint?`<small id="${id}-h">${esc(x.hint)}</small>`:"",desc=x.hint?` aria-describedby="${id}-h"`:"";
   if(x.type==="checks"||x.type==="radios"){
     const t=x.type==="checks"?"checkbox":"radio";
-    return `<fieldset class="checks wide"><legend>${esc(x.label)}</legend><div class="opts2">${x.options.map(([val,lab],i)=>
+    return `<fieldset class="checks wide${x.adv?" adv":""}"><legend>${esc(x.label)}${x.term?" "+qmark(x.term):""}</legend><div class="opts2">${x.options.map(([val,lab],i)=>
       `<label class="check"><input type="${t}" name="${id}" id="${id}-${i}" data-path="${x.path}" value="${esc(val)}"> ${esc(lab)}</label>`).join("")}</div>${hint}</fieldset>`;
   }
   let ctl;
@@ -2149,7 +2184,8 @@ function fieldHTML(x){
     const num=x.type==="number"?` min="${x.min||0}" max="${x.max}" step="1" inputmode="numeric"`:"";
     ctl=`<input id="${id}" data-path="${x.path}" type="${x.type||"text"}"${num}${list}${x.ph?` placeholder="${esc(x.ph)}"`:""} autocomplete="off"${desc}>${dl}`;
   }
-  return `<div class="field${x.rows?" wide":""}"><label for="${id}">${esc(x.label)}</label>${ctl}${hint}</div>`;
+  const ex=x.ex?`<details class="ex"><summary>Ver un ejemplo<span class="sr">: ${esc(x.label)}</span></summary><p>${esc(x.ex)}</p></details>`:"";
+  return `<div class="field${x.rows?" wide":""}${x.adv?" adv":""}"><div class="lblrow"><label for="${id}">${esc(x.label)}</label>${x.term?qmark(x.term):""}</div>${ctl}${hint}${ex}</div>`;
 }
 function setCtl(el){
   const x=FIELDS[el.dataset.path],v=valOr(el.dataset.path,x&&x.def!==undefined?x.def:"");
@@ -2157,7 +2193,7 @@ function setCtl(el){
   else if(el.type==="radio")el.checked=v===el.value;
   else el.value=Array.isArray(v)?"":v;
 }
-const groupHTML=([title,fields])=>fields.length?`<fieldset class="fgroup"><legend>${esc(title)}</legend><div class="fgrid">${fields.map(fieldHTML).join("")}</div></fieldset>`:"";
+const groupHTML=([title,fields])=>fields.length?`<fieldset class="fgroup${fields.every(x=>x.adv)?" adv":""}"><legend>${esc(title)}</legend><div class="fgrid">${fields.map(fieldHTML).join("")}</div></fieldset>`:"";
 
 function renderProgress(){
   const p=activeP(),d=[1,2].filter(isDone).length+(p?[3,4,5,6,7,8,9,10].filter(n=>p.done[n]).length:0);
@@ -2170,39 +2206,42 @@ function stItem(n){
 }
 function renderStepper(){
   const p=activeP();
-  $("#stepper").innerHTML=`<div><p class="sg">Tu negocio</p><ol class="stepper">${[1,2].map(stItem).join("")}</ol></div><div><p class="sg">${p?"Prospecto: "+esc(pname(p)):"Prospecto: sin elegir"}</p><ol class="stepper">${[3,4,5,6,7,8,9,10].map(stItem).join("")}</ol></div>`;
+  $("#stepper").innerHTML=`<div><p class="sg">Tu negocio</p><ol class="stepper">${[1,2].map(stItem).join("")}</ol></div><div><p class="sg">${p?"Empresa: "+esc(pname(p)):"Empresa: sin elegir"}</p><ol class="stepper">${[3,4,5,6,7,8,9,10].map(stItem).join("")}</ol></div>`;
   renderProgress();
 }
 function stepFoot(n){
   const dis=!isGlobal(n)&&!activeP(),done=isDone(n),nx=n<10?stepDef(n+1):null;
-  return `<footer class="sc-foot"><button type="button" class="btn" data-act="prev"${n===1?" disabled":""}>Paso anterior</button>${n>=7&&!dis?`<button type="button" class="btn" data-act="newint">Registrar interacción</button>`:""}
+  return `<footer class="sc-foot"><button type="button" class="btn" data-act="prev"${n===1?" disabled":""}>Paso anterior</button>${n>=7&&!dis?`<button type="button" class="btn" data-act="newint">Apuntar un contacto</button>`:""}
     <button type="button" class="btn toggle" data-act="done" aria-pressed="${done}"${dis?" disabled":""}>${done?"Completado ✓":"Marcar como completado"}</button>
     ${nx?`<button type="button" class="btn primary" data-act="next" id="btnNext">Siguiente: ${pad(n+1)} ${esc(nx.short)}</button>`:`<button type="button" class="btn primary" data-act="gocrm">Ver mis prospectos</button>`}</footer>`;
 }
 function renderStep(focus){
   const n=store.ui.step,s=stepDef(n),p=activeP(),st=stepState(n),v=curVariant(n),key=n;
-  let h=`<header class="sc-head"><span class="sc-num" aria-hidden="true">${pad(n)}</span><div class="sc-t"><div class="meta"><span class="state is-${st}" id="scState">${STTXT[st]}</span><span class="tag">${isGlobal(n)?"Tu negocio":p?"Prospecto: "+esc(pname(p)):"Requiere un prospecto"}</span></div>
+  let h=`<header class="sc-head"><span class="sc-num" aria-hidden="true">${pad(n)}</span><div class="sc-t"><div class="meta"><span class="state is-${st}" id="scState">${STTXT[st]}</span><span class="tag">${isGlobal(n)?"Tu negocio":p?"Empresa: "+esc(pname(p)):"Requiere una empresa"}</span></div>
     <h3 id="scTitle" tabindex="-1">Paso ${n}. ${esc(s.title)}</h3><p>${esc(s.purpose)} <button type="button" class="link helplink" data-act="help">Más ayuda sobre este paso<span class="sr"> en la Guía</span></button></p></div></header><div class="sc-body">
     <details class="help"><summary>Cómo hacer este paso</summary><ol>${s.help.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></details>`;
   if(!isGlobal(n)&&!p){
-    h+=`<div class="empty-in"><p>Este paso trabaja sobre un prospecto concreto. Crea uno o elige uno de tu lista; también puedes registrar empresas en el paso 2.</p><div class="row-btns"><button type="button" class="btn primary" data-act="newp">Nuevo prospecto</button>${store.prospects.length?'<button type="button" class="btn" data-act="gocrm">Elegir en Prospectos</button>':'<button type="button" class="btn" data-act="go2">Ir al paso 2</button>'}</div></div></div>`+stepFoot(n);
+    h+=`<div class="empty-in"><p>Este paso trabaja sobre un prospecto concreto. Crea uno o elige uno de tu lista; también puedes registrar empresas en el paso 2.</p><div class="row-btns"><button type="button" class="btn primary" data-act="newp">Nueva empresa</button>${store.prospects.length?'<button type="button" class="btn" data-act="gocrm">Elegir en Prospectos</button>':'<button type="button" class="btn" data-act="go2">Ir al paso 2</button>'}</div></div></div>`+stepFoot(n);
     $("#stepCard").innerHTML=h;if(focus)$("#scTitle").focus();return;
   }
+  if(s.groups.some(g=>g[1].some(x=>x.adv)))h+=`<p class="simple-only simple-note">Estás en el modo sencillo: ves solo los campos imprescindibles. <button type="button" class="link" data-act="showall">Mostrar todos los campos</button></p>`;
   if(s.before)h+=s.before();
   h+=s.groups.map(groupHTML).join("");
   if(s.prompts.length>1)h+=`<div class="variants"><p class="fsub" id="vl${n}"><strong>¿Qué quieres preparar?</strong></p><div class="seg" role="group" aria-labelledby="vl${n}">${s.prompts.map(x=>`<button type="button" data-variant="${x.id}" aria-pressed="${x.id===v.id}">${esc(x.label)}</button>`).join("")}</div></div>`;
   if(v.fields)h+=groupHTML(["Datos para este prompt",v.fields]);
   h+=`<div class="missing" id="scMissing" role="status" aria-live="polite"></div>
-    <section class="promptbox" aria-labelledby="pbH"><h4 id="pbH">Instrucciones para tu asistente de IA</h4>
+    <section class="promptbox" aria-labelledby="pbH"><h4 id="pbH">Instrucciones para tu asistente de IA ${qmark("Prompt")}</h4>
+    <ol class="cycle"><li><b>1</b>Copia las instrucciones</li><li><b>2</b>Pégalas en ChatGPT, Claude u otro asistente</li><li><b>3</b>Copia su respuesta y pégala aquí debajo</li></ol>
     <p class="small-note">Copia el prompt, pégalo en ChatGPT, Claude u otro asistente y trae aquí su respuesta. Esta web no se conecta con ellos: no envía ni recibe nada por ti.</p>
     <div class="pb-actions" id="pbGen"${shownPrompts[key]?" hidden":""}><button type="button" class="btn primary" data-act="gen">${esc(v.btn||"Generar instrucciones para IA")}</button></div>
     <div id="pbOut"${shownPrompts[key]?"":" hidden"}><pre class="pv" id="pbText" tabindex="0" aria-label="Prompt generado"></pre>
     <p class="small-note">El prompt se actualiza solo cuando cambias los datos.</p>
-    <div class="pb-actions"><button type="button" class="btn primary" data-act="copyp">Copiar prompt</button>
+    <div class="pb-actions"><button type="button" class="btn primary" data-act="copyp">Copiar instrucciones</button>
     <a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" data-act="openai">Copiar y abrir ChatGPT</a>
     <a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" data-act="openai">Copiar y abrir Claude</a>
-    <button type="button" class="btn" data-act="savep">Guardar en Mis prompts</button></div></div></section>
+    <button type="button" class="btn adv" data-act="savep">Guardar en mi biblioteca</button></div></div></section>
     <section class="resultbox" aria-labelledby="rbH"><div class="field"><label id="rbH" for="resText">${esc(v.rlabel||"Respuesta de la IA")}</label>
+    <button type="button" class="btn paste" data-act="paste">Pegar la respuesta</button>
     <textarea id="resText" data-result="${v.id}" rows="10" placeholder="Pega aquí la respuesta de tu asistente de IA." aria-describedby="resMeta"></textarea>
     <small id="resMeta"></small></div><div class="pb-actions"><button type="button" class="btn" data-act="saveres">Guardar resultado</button></div></section>`;
   if(s.after)h+=s.after();
@@ -2229,7 +2268,7 @@ function updatePrompt(){const pre=$("#pbText");if(pre&&!$("#pbOut").hidden)pre.t
 function updateScore(){
   const el=$("#scoreCard");if(!el)return;
   const si=scoreInfo(activeP());
-  el.innerHTML=`<div class="scorenum">${si.n?si.tot:"–"}<small>/100</small></div><div><span class="prio" data-p="${si.n?si.prio:""}">${si.n?"Prioridad "+si.prio:"Sin puntuar"}</span><p class="muted">${si.n===6?"Puntuación orientativa con los 6 criterios valorados. No es una predicción.":si.n?`Valoración provisional: ${si.n} de 6 criterios puntuados. Completa el resto antes de decidir.`:"Puntúa cada criterio con lo que sepas. Puedes pedir a la IA una propuesta y ajustarla tú."}</p></div>`;
+  el.innerHTML=`<div class="scorenum">${si.n?si.tot:"–"}<small>/100</small></div><div><span>${qmark("Puntuación de la oportunidad")}</span><span class="prio" data-p="${si.n?si.prio:""}">${si.n?"Prioridad "+si.prio:"Sin puntuar"}</span><p class="muted">${si.n===6?"Puntuación orientativa con los 6 criterios valorados. No es una predicción.":si.n?`Valoración provisional: ${si.n} de 6 criterios puntuados. Completa el resto antes de decidir.`:"Puntúa cada criterio con lo que sepas. Puedes pedir a la IA una propuesta y ajustarla tú."}</p></div>`;
 }
 function refreshStates(){
   const n=store.ui.step,st=stepState(n),el=$("#scState");
@@ -2282,7 +2321,7 @@ card.addEventListener("click",e=>{
   else if(act==="savep"){
     const p=activeP(),cat={1:"inv",2:"inv",3:"inv",4:"inv",5:"inv",6:"bon",7:"ema",8:"lla",9:"bon",10:"lla"}[n];
     const np={id:uid("c"),cat,title:(`Paso ${n}: ${v.label}`+(p&&!isGlobal(n)?` (${pname(p)})`:"")).slice(0,140),when:`Guardado desde Mi sistema el ${fmtDate(nowISO(),false)}.`,text:buildPrompt(n,v)};
-    store.own.push(np);save();renderShell();doneFlash(b);toast("Guardado en Mis prompts, dentro de la Biblioteca");
+    store.own.push(np);save();renderShell();doneFlash(b);toast("Guardado en tu biblioteca, en «Mis prompts»");
   }
   else if(act==="saveres"){flush();doneFlash(b);toast("Resultado guardado");resMeta(n,v)}
   else if(act==="prev")goStep(n-1,true);
@@ -2299,6 +2338,8 @@ card.addEventListener("click",e=>{
   }
   else if(act==="newp")openPDialog(null,b);
   else if(act==="help")openGuideStep(n);
+  else if(act==="paste")pasteInto($("#resText"));
+  else if(act==="showall"){store.ui.simple=false;save();applySimple();toast("Modo completo: ves todos los campos")}
   else if(act==="newint")openInt(activeP().id,b);
   else if(act==="sched")scheduleSeq(b);
   else if(act==="objlib")openObj(b);
@@ -2379,7 +2420,7 @@ $("#btnWhatNow").addEventListener("click",()=>{
 });
 $("#stepper").addEventListener("click",e=>{const b=e.target.closest("[data-step]");if(b)goStep(+b.dataset.step,true)});
 
-/* ================= Fichas de prospectos (CRM) ================= */
+/* ================= Fichas de empresas (CRM) ================= */
 const doneCount=p=>[3,4,5,6,7,8,9,10].filter(n=>p.done[n]).length;
 function renderCRM(){
   const sel=$("#crmEstado");
@@ -2395,15 +2436,15 @@ function renderCRM(){
       <div class="pc-meta"><span class="estado">${esc(p.estado)}</span><span>${si.n?`${si.tot}/100, prioridad ${si.prio}${si.n<6?" (provisional)":""}`:"Sin puntuar"}</span>
         ${(()=>{const l=intsOf(p.id)[0];return l?`<span>Último contacto: ${dShort(l.fecha)}</span>`:""})()}<span class="mini">${dc} de 8 pasos<span class="bar" aria-hidden="true"><i style="width:${dc/8*100}%"></i></span></span>
         ${p.proxima?`<span class="pc-next">Próxima acción: ${esc(p.proxima)}${p.proximaFecha?`, ${esc(fmtDate(p.proximaFecha,false))}`:""}</span>`:""}</div>
-      <div class="card-actions"><button type="button" class="btn primary" data-cont="${p.id}">Continuar<span class="sr"> con ${esc(pname(p))}</span></button><button type="button" class="btn" data-int="${p.id}">Registrar<span class="sr"> interacción con ${esc(pname(p))}</span></button><button type="button" class="btn" data-card="${p.id}">Ver ficha<span class="sr"> de ${esc(pname(p))}</span></button></div>
+      <div class="card-actions"><button type="button" class="btn primary" data-cont="${p.id}">Continuar<span class="sr"> con ${esc(pname(p))}</span></button><button type="button" class="btn" data-int="${p.id}">Apuntar contacto<span class="sr"> con ${esc(pname(p))}</span></button><button type="button" class="btn" data-card="${p.id}">Ver ficha<span class="sr"> de ${esc(pname(p))}</span></button></div>
     </article></li>`}).join("");
   const none=!list.length;
   $("#crmList").hidden=none;$("#crmEmpty").hidden=!none;
   if(none){
     const any=store.prospects.length;
-    $("#crmEmptyTitle").textContent=any?"Sin resultados":"Aún no tienes prospectos";
-    $("#crmEmptyText").textContent=any?"Ningún prospecto coincide con la búsqueda o el estado elegido.":"Crea tu primer prospecto o registra empresas objetivo en el paso 2 de Mi sistema.";
-    $("#crmEmptyBtn").textContent=any?"Ver todos los prospectos":"Nuevo prospecto";
+    $("#crmEmptyTitle").textContent=any?"Sin resultados":"Aún no tienes empresas";
+    $("#crmEmptyText").textContent=any?"Ningún prospecto coincide con la búsqueda o el estado elegido.":"Crea tu primera empresa o registra empresas objetivo en el paso 2 de Mi sistema.";
+    $("#crmEmptyBtn").textContent=any?"Ver todas las empresas":"Nueva empresa";
   }
   $("#crmStatus").textContent=none?"":`Mostrando ${list.length} de ${store.prospects.length} prospectos.`;
 }
@@ -2423,7 +2464,7 @@ function setActive(id,quiet){
   if(!$("#view-sistema").hidden)renderSystem();
   if(!$("#view-biblioteca").hidden)renderGrid();
   if(!$("#view-prospectos").hidden)renderCRM();
-  if(!quiet&&id)toast("Prospecto activo: "+pname(pById(id)));
+  if(!quiet&&id)toast("Empresa activa: "+pname(pById(id)));
 }
 $("#selProspect").addEventListener("change",e=>setActive(e.target.value||null));
 
@@ -2433,7 +2474,7 @@ function openPDialog(id,opener,after){
   editP=id?pById(id):null;pOpener=opener||document.activeElement;pDone=after||null;
   $("#pp-es").innerHTML=ESTADOS.map(e=>`<option>${e}</option>`).join("");
   $$("[data-k]",dlgP).forEach(i=>{const[a,b]=i.dataset.k.split(".");i.value=editP?(b?(editP[a][b]||""):editP[a]):(a==="estado"?"Nuevo":"")});
-  $("#dpTitleP").textContent=editP?"Editar prospecto":"Nuevo prospecto";$("#pSubmit").textContent=editP?"Guardar cambios":"Crear prospecto";
+  $("#dpTitleP").textContent=editP?"Editar empresa":"Nueva empresa";$("#pSubmit").textContent=editP?"Guardar cambios":"Crear empresa";
   $("#pErr").hidden=true;dlgP.showModal();$("#pp-en").focus();
 }
 $("#pCancel").addEventListener("click",()=>dlgP.close());
@@ -2444,7 +2485,7 @@ $("#pForm").addEventListener("submit",e=>{
   $$("[data-k]",dlgP).forEach(i=>{const[a,b]=i.dataset.k.split("."),v=i.value.trim();if(b){if(v)p[a][b]=v;else delete p[a][b]}else p[a]=ESTADOS.includes(v)?v:"Nuevo"});
   p.updated=nowISO();
   if(!editP){store.prospects.unshift(p);store.active=p.id}
-  save();const wasEdit=!!editP;dlgP.close();renderAllViews();toast(wasEdit?"Prospecto actualizado":`Prospecto creado y activo: ${pname(p)}`);
+  save();const wasEdit=!!editP;dlgP.close();renderAllViews();toast(wasEdit?"Prospecto actualizado":`Empresa creada y activa: ${pname(p)}`);
 });
 dlgP.addEventListener("close",()=>{const fn=pDone;pDone=null;editP=null;if(fn)fn();else if(pOpener&&pOpener.isConnected)pOpener.focus();else $("#btnNewP").focus()});
 $("#btnNewP").addEventListener("click",e=>openPDialog(null,e.currentTarget));
@@ -2465,7 +2506,7 @@ function openCard(id,opener){
     <section class="card-sec"><h3>Puntuación</h3>${si.n?`<p><strong>${si.tot}/100</strong>, prioridad ${si.prio}${si.n<6?`. Provisional: ${si.n} de 6 criterios valorados`:""}.</p>`:`<p class="muted">Sin puntuar. Hazlo en el paso 5.</p>`}${dl(fieldsOfStep(5).filter(x=>x.type!=="number"))}</section>
     <section class="card-sec"><h3>Investigación, estrategia, mensajes y análisis guardados</h3>${res.length?res.map((r,i)=>`<details class="res-item"><summary>${r.n?`Paso ${r.n}. ${esc(stepDef(r.n).title)}${stepDef(r.n).prompts.length>1?`: ${esc(r.v.label)}`:""}`:esc(TOOLDEF[r.tool].title)}${r.at?`<small>Guardado el ${esc(fmtDate(r.at))}</small>`:""}</summary><pre class="pv">${esc(r.t)}</pre><div class="pb-actions"><button type="button" class="btn" data-copyres="${i}">Copiar</button></div></details>`).join(""):`<p class="muted">Aún no has guardado respuestas de la IA para este prospecto.</p>`}</section>
     <section class="card-sec"><h3>Historial de interacciones</h3>${(()=>{const l=intsOf(p.id);return l.length?`<ul class="mini-list">${l.map(x=>`<li><span><strong>${dShort(x.fecha)}, ${esc(x.canal)}:</strong> ${esc(x.resultado)}${x.notas?`. ${esc(x.notas)}`:""}</span><button type="button" class="link danger" data-delint="${x.id}">Eliminar<span class="sr"> interacción del ${dShort(x.fecha)}</span></button></li>`).join("")}</ul>`:`<p class="muted">Sin interacciones registradas.</p>`})()}
-      <div class="row-btns"><button type="button" class="btn" id="cardInt">Registrar interacción</button></div></section>
+      <div class="row-btns"><button type="button" class="btn" id="cardInt">Apuntar un contacto</button></div></section>
     <section class="card-sec"><h3>Acciones pendientes</h3>${(()=>{const l=sortTasks(store.tasks.filter(t=>!t.done&&t.pid===p.id));return l.length?`<ul class="tasks">${l.map(taskRow).join("")}</ul>`:`<p class="muted">Sin acciones pendientes con este prospecto.</p>`})()}
       <div class="row-btns"><button type="button" class="btn" id="cardTask">Nueva acción</button></div></section>
     <section class="card-sec"><h3>Próxima acción y notas</h3><div class="pf2"><div class="pf"><label for="cardProx">Próxima acción</label><input id="cardProx" type="text" autocomplete="off"></div><div class="pf"><label for="cardProxF">Fecha</label><input id="cardProxF" type="date"></div></div>
@@ -2545,7 +2586,7 @@ $("#intForm").addEventListener("submit",e=>{
   if(!p||!fecha){$("#inErr").textContent=!p?"Elige el prospecto.":"Indica la fecha.";$("#inErr").hidden=false;return}
   const it={id:uid("i"),pid:p.id,fecha,canal:$("#in-c").value,resultado:$("#in-r").value,notas:$("#in-n").value.trim(),created:nowISO()};
   store.interactions.push(it);p.updated=nowISO();
-  let msg="Interacción registrada";
+  let msg="Contacto apuntado";
   const est=RES2ESTADO[it.resultado];if(est&&advance(p,est))msg+=`. Estado: ${p.estado}`;
   const pa=$("#in-pa").value.trim(),pf=isoOk($("#in-pf").value);
   if(pa){store.tasks.push({id:uid("t"),titulo:pa,pid:p.id,fecha:pf,prioridad:"Media",tipo:"Seguimiento",done:false,doneAt:"",created:nowISO()});p.proxima=pa;p.proximaFecha=pf;msg+=". Próxima acción añadida"}
@@ -2692,7 +2733,7 @@ function renderPanel(){
   const tile=(n,l,extra="")=>`<div class="kpi"><p class="kn">${n}</p><p class="kl">${l}</p>${extra}</div>`;
   $("#panelBody").innerHTML=`
   <div class="kpis">
-    ${tile(activos.length,"Prospectos activos",`<p class="kx">${sinContacto} sin contactar todavía</p>`)}
+    ${tile(activos.length,"Empresas activas",`<p class="kx">${sinContacto} sin contactar todavía</p>`)}
     ${tile(hoy+late,"Acciones para hoy",late?`<p class="kx late">${late} vencida${late>1?"s":""}</p>`:`<p class="kx">${pend.length} ${pend.length===1?"pendiente":"pendientes"} en total</p>`)}
     ${tile(seg,"Seguimientos pendientes")}
     ${tile(reun,"Reuniones programadas")}
@@ -2719,8 +2760,8 @@ function renderPanel(){
       ${[["Prospectos identificados",m.prospectos],["Empresas investigadas",m.investigadas],["Contactos realizados",m.contactos],["Emails enviados",m.emails],["Llamadas realizadas",m.llamadas],["Respuestas recibidas",m.respuestas],["Reuniones conseguidas",m.reuniones],["Oportunidades abiertas",m.abiertas],["Ventas cerradas",m.ventas]].map(([l,n])=>`<div><dt>${l}</dt><dd>${n}</dd></div>`).join("")}
     </div>
     <div class="rates">
-      <div><p class="kn">${pct(m.tRespuesta)}</p><p class="kl">Tasa de respuesta</p><p class="kx">${m.pContactados?`${m.pRespondieron} de ${m.pContactados} prospectos contactados respondieron`:"Sin contactos registrados"}</p></div>
-      <div><p class="kn">${pct(m.tReunion)}</p><p class="kl">Contactados que llegan a reunión</p><p class="kx">${m.pContactados?`${m.reuniones} de ${m.pContactados}`:"Sin contactos registrados"}</p></div>
+      <div><p class="kn">${pct(m.tRespuesta)}</p><p class="kl">Tasa de respuesta ${qmark("Tasa de respuesta")}</p><p class="kx">${m.pContactados?`${m.pRespondieron} de ${m.pContactados} prospectos contactados respondieron`:"Sin contactos registrados"}</p></div>
+      <div><p class="kn">${pct(m.tReunion)}</p><p class="kl">Contactados que llegan a reunión ${qmark("Tasa de conversión")}</p><p class="kx">${m.pContactados?`${m.reuniones} de ${m.pContactados}`:"Sin contactos registrados"}</p></div>
       <div><p class="kn">${pct(m.tCierre)}</p><p class="kl">Reuniones que acaban en venta</p><p class="kx">${m.reuniones?`${m.ventas} de ${m.reuniones}`:"Sin reuniones registradas"}</p></div>
     </div>
     ${m.pContactados&&m.pContactados<10?`<p class="small-note">Con menos de 10 prospectos contactados, los porcentajes cambian mucho con cada caso: tómalos como orientación.</p>`:""}
@@ -2730,7 +2771,7 @@ function renderPanel(){
       <table class="sr"><caption>Contactos y respuestas por semana</caption><thead><tr><th>Semana del</th><th>Contactos</th><th>Respuestas</th></tr></thead><tbody>${w.map(x=>`<tr><td>${dShort(x.a)}</td><td>${x.c}</td><td>${x.r}</td></tr>`).join("")}</tbody></table>
     </figure>
     <div class="promptbox"><h4>Analizar mi actividad con IA</h4><p class="small-note">Genera un prompt con tus cifras para que tu asistente de IA te sugiera mejoras. Esta web no lo envía: lo copias tú.</p>
-      <div class="pb-actions"><button type="button" class="btn primary" id="evalCopy">Copiar prompt de análisis</button><a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" data-evalopen>Copiar y abrir ChatGPT</a><a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" data-evalopen>Copiar y abrir Claude</a></div></div>
+      <div class="pb-actions"><button type="button" class="btn primary" id="evalCopy">Copiar instrucciones de análisis</button><a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" data-evalopen>Copiar y abrir ChatGPT</a><a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" data-evalopen>Copiar y abrir Claude</a></div></div>
   </section>`;
 }
 $("#panelBody").addEventListener("click",e=>{
@@ -2847,8 +2888,8 @@ function openTool(id,opener){
       const ctl=x.options?`<select class="sel" id="${id2}" data-tk="${x.k}">${x.options.map(o=>`<option${v[x.k]===o?" selected":""}>${o}</option>`).join("")}</select>`:`<textarea id="${id2}" data-tk="${x.k}" rows="${x.rows}"${x.ph?` placeholder="${esc(x.ph)}"`:""}${x.hint?` aria-describedby="${id2}-h"`:""}></textarea>`;
       return `<div class="pf"><label for="${id2}">${x.label}</label>${ctl}${h}</div>`}).join("")}
     <section class="promptbox"><h4>Instrucciones para tu asistente de IA</h4><pre class="pv" id="toolText" tabindex="0" aria-label="Prompt generado"></pre>
-      <div class="pb-actions"><button type="button" class="btn primary" id="toolCopy">Copiar prompt</button><a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" data-topen>Copiar y abrir ChatGPT</a><a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" data-topen>Copiar y abrir Claude</a></div></section>
-    <div class="pf"><label for="toolRes">Respuesta de la IA</label><textarea id="toolRes" rows="7" placeholder="Pega aquí la respuesta de tu asistente de IA."></textarea>
+      <div class="pb-actions"><button type="button" class="btn primary" id="toolCopy">Copiar instrucciones</button><a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" data-topen>Copiar y abrir ChatGPT</a><a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" data-topen>Copiar y abrir Claude</a></div></section>
+    <div class="pf"><label for="toolRes">Respuesta de la IA</label><button type="button" class="btn paste" id="toolPaste">Pegar la respuesta</button><textarea id="toolRes" rows="7" placeholder="Pega aquí la respuesta de tu asistente de IA."></textarea>
       <small>${p?"Puedes guardarla en la ficha del prospecto activo.":"Para guardarla necesitas un prospecto activo."}</small></div>
     <div class="row"><button type="button" class="btn" id="toolSave"${p?"":" disabled"}>Guardar en la ficha</button><button type="button" class="btn primary" id="toolClose">Cerrar</button></div>`;
   $$("textarea[data-tk]",dlgTool).forEach(t=>t.value=v[t.dataset.tk]||"");
@@ -2863,6 +2904,7 @@ dlgTool.addEventListener("click",e=>{
   if(t.closest("#toolCopy"))copyText(TOOLDEF[toolId].build(toolVals(toolId),useP()),t.closest("#toolCopy"),"Prompt");
   else if(t.closest("[data-topen]"))copyText(TOOLDEF[toolId].build(toolVals(toolId),useP()),null,"Prompt");
   else if(t.closest("#toolClose"))dlgTool.close();
+  else if(t.closest("#toolPaste"))pasteInto($("#toolRes"));
   else if(t.closest("#toolSave")){
     const p=activeP(),txt=$("#toolRes").value;if(!p)return;
     p.results.tool=p.results.tool||{};p.savedAt.tool=p.savedAt.tool||{};
@@ -2898,7 +2940,7 @@ function renderObj(openIdx){
   const p=activeP(),list=allObj();
   $("#objCtx").textContent=p?`Los prompts usan los datos de «${pname(p)}», el prospecto activo, y tu negocio.`:"No hay prospecto activo: los prompts usan solo los datos de tu negocio.";
   $("#objList").innerHTML=list.map((o,i)=>{const a=store.objAnswers[o]||"",own=i>=OBJ.length;return `<li><details class="res-item"${i===openIdx?" open":""}><summary>«${esc(o)}»${a.trim()?'<small class="saved">Respuesta guardada</small>':""}</summary>
-    <div class="obj-body"><div class="pb-actions"><button type="button" class="btn" data-ocopy="${i}">Copiar prompt para prepararla</button><a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" data-oopen="${i}">Copiar y abrir ChatGPT</a></div>
+    <div class="obj-body"><div class="pb-actions"><button type="button" class="btn" data-ocopy="${i}">Copiar instrucciones para prepararla</button><a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" data-oopen="${i}">Copiar y abrir ChatGPT</a></div>
     <div class="pf"><label for="oa-${i}">Mi respuesta</label><textarea id="oa-${i}" rows="4" data-oans="${i}" placeholder="Pega o escribe la respuesta que vas a usar."></textarea></div>
     <div class="pb-actions"><button type="button" class="btn" data-ocopyans="${i}">Copiar mi respuesta</button>${own?`<button type="button" class="link danger" data-odel="${i}">Eliminar objeción</button>`:""}</div></div></details></li>`}).join("");
   list.forEach((o,i)=>{$(`#oa-${i}`).value=store.objAnswers[o]||""});
@@ -3421,7 +3463,7 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change",applyTheme)
 const GO={
   "s1":["Ir al paso 1",()=>{showView("sistema",true);goStep(1,true)}],"s2":["Ir al paso 2",()=>{showView("sistema",true);goStep(2,true)}],
   "s3":["Ir al paso 3",()=>{showView("sistema",true);goStep(3,true)}],"sistema":["Ir a Mi sistema",()=>showView("sistema",true)],
-  "panel":["Ir al Panel",()=>showView("panel",true)],"prospectos":["Ir a Prospectos",()=>showView("prospectos",true)],
+  "panel":["Ir al Panel",()=>showView("panel",true)],"prospectos":["Ir a Empresas",()=>showView("prospectos",true)],
   "biblioteca":["Ir a la Biblioteca",()=>showView("biblioteca",true)],"email":["Abrir el analizador de emails",b=>openTool("email",b)],
   "obj":["Abrir la biblioteca de objeciones",b=>openObj(b)],"backup":["Abrir la copia de seguridad",()=>$("#btnBackup").click()],
   "newint":["Registrar una interacción",b=>openInt(null,b)],"demo":["Cargar el ejemplo",b=>toggleDemo(b)]
@@ -3445,7 +3487,7 @@ const GLOSARIO=[
   ["Cliente ideal","Retrato del tipo de empresa y de persona que más se beneficia de lo que vendes. También se llama ICP, por sus siglas en inglés."],
   ["Contexto","Toda la información que acompaña a una petición: tu negocio, la empresa, la persona y lo que ya sabes. Cuanto mejor es el contexto, mejor responde la IA."],
   ["Copia de seguridad","Archivo con todos tus datos de la plataforma. Sirve para no perderlos y para pasarlos a otro navegador u ordenador."],
-  ["CRM","Herramienta donde se guarda la información de los clientes y de cada contacto con ellos. La pestaña Prospectos funciona como un CRM sencillo."],
+  ["CRM","Herramienta donde se guarda la información de los clientes y de cada contacto con ellos. La pestaña Empresas funciona como un CRM sencillo."],
   ["Decisor","Persona que tiene la última palabra en la compra o que controla el presupuesto."],
   ["Disparador","Algo que ha pasado en la empresa o en su sector y que hace oportuno contactar ahora: un cargo nuevo, una expansión o una ley que cambia, por ejemplo."],
   ["Embudo","Forma de ver el proceso comercial: entran muchos prospectos y, paso a paso, menos llegan a reunión y a venta. Como un embudo de cocina."],
@@ -3463,7 +3505,7 @@ const GLOSARIO=[
   ["Propuesta de valor","Frase que explica qué haces, para quién y qué resultado obtiene. Es la respuesta corta a «¿y por qué debería escucharte?»."],
   ["Prospección","Buscar y contactar empresas que podrían convertirse en clientes."],
   ["Prospecto","Empresa o persona que podría ser cliente pero todavía no lo es."],
-  ["Prospecto activo","El prospecto con el que estás trabajando ahora. Se elige arriba, junto a las pestañas, y todos los prompts usan sus datos."],
+  ["Empresa activa","La empresa (prospecto) con la que estás trabajando ahora. Se elige arriba, junto a las pestañas, y todos los prompts usan sus datos."],
   ["Puntuación de la oportunidad","Nota de 0 a 100 que das a un prospecto con seis criterios. Es orientativa, no una predicción."],
   ["Segmento","Grupo de empresas parecidas, por sector, tamaño o zona."],
   ["Secuencia","Serie planificada de contactos de seguimiento, con días entre uno y otro."],
@@ -3481,7 +3523,7 @@ const FAQ=[
   ["¿Qué hago si la IA se inventa algo?","Comprueba siempre los datos antes de usarlos. Los prompts piden a la IA que marque qué es un hecho, qué es una hipótesis y qué no sabe, pero puede equivocarse igualmente. Nunca envíes a un cliente algo que no hayas verificado.",""],
   ["¿Tengo que rellenar todos los campos?","No. Rellena lo que sepas. Si falta algo importante, la plataforma te avisa y el prompt pide a la IA que no lo suponga.",""],
   ["¿Tengo que seguir los pasos en orden?","Es lo recomendable, porque cada paso aprovecha lo anterior, pero puedes saltar a cualquiera. Si dudas, pulsa «¿Qué tengo que hacer ahora?» en Mi sistema.","sistema"],
-  ["¿Cómo trabajo con varios prospectos a la vez?","Cada empresa tiene su ficha. Elige el prospecto activo en el selector de arriba y todo, el recorrido y los prompts, se adapta a él.","prospectos"],
+  ["¿Cómo trabajo con varios prospectos a la vez?","Cada empresa tiene su ficha. Elige la empresa activa en el selector de arriba y todo, el recorrido y los prompts, se adapta a él.","prospectos"],
   ["¿Qué significa la puntuación de 0 a 100?","Es una valoración tuya, con ayuda de la IA si quieres, para decidir dónde poner tu tiempo. No predice si vas a vender. Si faltan criterios por puntuar, aparece como provisional.",""],
   ["¿Por qué cambia solo el estado de un prospecto?","Para ahorrarte trabajo: al completar la investigación pasa a «Investigado», al preparar los mensajes a «Contacto preparado» y al registrar respuestas o reuniones avanza en consecuencia. Nunca retrocede solo y siempre puedes cambiarlo a mano.",""],
   ["¿Cómo se calculan las métricas del Panel?","Solo con lo que registras: prospectos, estados e interacciones. Si no registras tus contactos, el Panel no puede saberlos. El ejemplo para practicar no cuenta en las métricas.","panel"],
@@ -3510,7 +3552,7 @@ function guideHTML(){
       <li><div><strong>Apunta 2 o 3 empresas.</strong> Las que crees que podrían necesitarte. Cada una tendrá su ficha.</div>${goBtn("s2")}</li>
       <li><div><strong>Investiga una.</strong> Pulsa «Generar instrucciones para IA», copia el texto en tu asistente y pega aquí su respuesta.</div>${goBtn("s3")}</li>
       <li><div><strong>Déjate guiar.</strong> Cuando no sepas qué hacer, pulsa «¿Qué tengo que hacer ahora?» en Mi sistema.</div>${goBtn("sistema")}</li>
-      <li><div><strong>Apunta cada contacto.</strong> Cada email, llamada o reunión, con «Registrar interacción». Tu Panel te dirá qué toca y cómo vas.</div>${goBtn("panel")}</li>
+      <li><div><strong>Apunta cada contacto.</strong> Cada email, llamada o reunión, con «Apuntar un contacto». Tu Panel te dirá qué toca y cómo vas.</div>${goBtn("panel")}</li>
     </ol>
     <p class="gtip">¿Prefieres verlo funcionando antes de usar tus datos? Carga el ejemplo para practicar: es una empresa inventada con los pasos ya rellenados y se quita con un clic.</p>
   </section>
@@ -3526,8 +3568,8 @@ function guideHTML(){
       <p>Cada paso tiene una ayuda, unos campos, un botón para generar las instrucciones, un espacio para pegar la respuesta y un botón para marcarlo como completado. En la barra de pasos ves cuáles están <strong>pendientes</strong>, <strong>en curso</strong> o <strong>completados</strong>.</p>
       <ol class="gpasos">${STEPS.map(s=>`<li id="gp-${s.n}" tabindex="-1"><strong>Paso ${s.n}. ${esc(s.title)}.</strong> ${esc(STEPHELP[s.n])}</li>`).join("")}</ol>
       ${goBtn("sistema")}</div></details>
-    <details class="gdet"><summary>El día a día: Panel y Prospectos</summary><div class="gbody">
-      <p><strong>Prospectos</strong> es tu archivador: una ficha por empresa con sus datos, la investigación, la puntuación, los mensajes, el historial de contactos y el estado. Puedes buscar, filtrar por estado y ordenar.</p>
+    <details class="gdet"><summary>El día a día: Panel y Empresas</summary><div class="gbody">
+      <p><strong>Empresas</strong> es tu archivador: una ficha por empresa con sus datos, la investigación, la puntuación, los mensajes, el historial de contactos y el estado. Puedes buscar, filtrar por estado y ordenar.</p>
       <p><strong>Panel</strong> es tu mesa de trabajo de cada mañana:</p>
       <ul class="glist"><li>«Mis próximas acciones»: lo que tienes que hacer, ordenado por fecha y prioridad. Las vencidas salen en rojo.</li><li>Últimas actividades y empresas prioritarias.</li><li>Resultados: cuántos contactos, respuestas y reuniones llevas, y qué porcentaje avanza de una etapa a otra.</li></ul>
       <p>La clave es <strong>registrar cada contacto</strong>. Es como anotar los gastos: si no apuntas, a final de mes no sabes en qué se fue el dinero.</p>
@@ -3654,9 +3696,9 @@ function toggleDemo(btn){
 const TOUR=[
   ['.tab[data-view="sistema"]',"Mi sistema","El recorrido de 10 pasos, de definir tu negocio a conseguir la reunión. Empieza por aquí."],
   ['.tab[data-view="panel"]',"Panel","Tus próximas acciones, tu actividad y tus resultados."],
-  ['.tab[data-view="prospectos"]',"Prospectos","La ficha de cada empresa: datos, investigación, estado e historial de contactos."],
+  ['.tab[data-view="prospectos"]',"Empresas","La ficha de cada empresa: datos, investigación, estado e historial de contactos."],
   ['.tab[data-view="biblioteca"]',"Biblioteca","20 prompts listos y herramientas como el analizador de emails o la biblioteca de objeciones."],
-  ["#selProspect","Prospecto activo","Elige aquí con qué empresa trabajas. Todos los prompts usan sus datos."],
+  ["#selProspect","Empresa activa","Elige aquí con qué empresa trabajas. Todos los prompts usan sus datos."],
   ['.tab[data-view="guia"]',"Guía","Si tienes dudas, aquí está todo explicado, con glosario y preguntas frecuentes. También puedes cargar un ejemplo para practicar."]];
 let tourI=-1,tourFrom=null;
 function startTour(manual){tourFrom=manual?document.activeElement:null;tourI=0;showTourStep()}
@@ -3688,12 +3730,90 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&tourI>=0&&!$("dialo
 addEventListener("resize",placeTour);addEventListener("scroll",placeTour,{passive:true});
 function maybeTour(){if(!store.ui.tourDone&&!window.__noTour&&!store.prospects.length&&!Object.keys(store.business).length)setTimeout(()=>startTour(false),700)}
 
+/* ================= Facilidad de uso: modo sencillo, términos, pegar, ejemplos y recordatorio ================= */
+/* Campos que el modo sencillo oculta (siguen usándose en los prompts si tienen datos). */
+const ADV=["business.telefono","business.descripcion","business.ventajas","business.diferenciacion","business.beneficios","business.zona","business.ticket","business.objetivo",
+  "icp.empleados","icp.facturacion","icp.tipo","icp.prioritarias","icp.descartar",
+  "p.empresa.actividad","p.empresa.tamano","p.empresa.productos","p.empresa.clientes","p.empresa.cambios","p.empresa.oportunidades",
+  "p.contacto.departamento","p.contacto.telefono","p.contacto.influencia","p.contacto.responsabilidad",
+  "p.score.fortalezas","p.score.riesgos","p.score.pendiente","p.score.recomendacion","p.inputs.objetivo6","p.inputs.canal6"];
+const EX={
+  "business.producto":"Mantenimiento preventivo de climatización para naves industriales.",
+  "business.problema":"Averías en verano que paran la producción y facturas de reparación urgentes.",
+  "business.propuesta":"Revisamos la climatización de tu nave antes del verano para que no se pare la producción por una avería.",
+  "business.clienteIdeal":"Empresas de logística y fabricación de Galicia con naves de más de 2.000 m² y entre 20 y 200 personas.",
+  "business.descripcion":"Empresa con 15 años de experiencia en instalaciones industriales, con técnicos propios y respuesta en 24 horas.",
+  "business.ventajas":"Técnicos propios en toda Galicia; informe del estado de cada equipo después de cada visita.",
+  "business.beneficios":"Menos reparaciones urgentes y menos horas de producción perdidas por averías.",
+  "icp.necesidades":"Evitar paradas por averías; controlar el gasto en mantenimiento; cumplir las revisiones obligatorias.",
+  "icp.prioritarias":"Han ampliado la nave hace poco o están contratando personal de operaciones.",
+  "p.empresa.noticias":"Marzo de 2026: anuncia una nueva nave en el polígono de Sigüeiro (enlace a la noticia).",
+  "p.empresa.problemas":"Con la nave nueva, más equipos que mantener y el mismo equipo técnico.",
+  "p.score.justificacion":"Encaja con el cliente ideal y hay una señal clara (nave nueva), pero no sé si tienen ya un proveedor."
+};
+const TERMS={"business.clienteIdeal":"Cliente ideal","business.propuesta":"Propuesta de valor","p.inputs.enfoque":"Enfoque","p.inputs.objeciones":"Objeción","p.inputs.seqCanales":"Secuencia"};
+ADV.forEach(k=>{if(FIELDS[k])FIELDS[k].adv=1});
+for(const k in EX)if(FIELDS[k])FIELDS[k].ex=EX[k];
+for(const k in TERMS)if(FIELDS[k])FIELDS[k].term=TERMS[k];
+
+/* Modo sencillo */
+function applySimple(){
+  root.classList.toggle("simple",!!store.ui.simple);
+  const b=$("#btnSimple");b.setAttribute("aria-pressed",!!store.ui.simple);
+}
+$("#btnSimple").addEventListener("click",()=>{
+  store.ui.simple=!store.ui.simple;save();applySimple();
+  toast(store.ui.simple?"Modo sencillo: verás solo lo imprescindible":"Modo completo: verás todos los campos y opciones");
+});
+
+/* Ayuda «?» con la definición del glosario */
+const qmark=t=>`<button type="button" class="qmark" data-term="${esc(t)}" aria-label="¿Qué significa «${esc(t)}»?">?</button>`;
+const dlgTerm=$("#dlgTerm");let termFrom=null;
+document.addEventListener("click",e=>{
+  const b=e.target.closest(".qmark");if(!b)return;
+  e.preventDefault();e.stopPropagation();
+  const t=b.dataset.term,g=GLOSARIO.find(x=>x[0]===t);
+  termFrom=b;$("#termTitle").textContent=t;$("#termText").textContent=g?g[1]:"";
+  dlgTerm.showModal();$("#termClose").focus();
+},true);
+$("#termClose").addEventListener("click",()=>dlgTerm.close());
+$("#termGlos").addEventListener("click",()=>{termFrom=null;dlgTerm.close();showView("guia",true);showGSec("g-glos",true)});
+dlgTerm.addEventListener("close",()=>{if(termFrom&&termFrom.isConnected)termFrom.focus();termFrom=null});
+
+/* Pegar la respuesta desde el portapapeles */
+async function pasteInto(ta){
+  let t="";
+  try{if(!navigator.clipboard||!navigator.clipboard.readText)throw 0;t=await navigator.clipboard.readText()}
+  catch(e){ta.focus();toast("Tu navegador no deja pegar con el botón. Pulsa Ctrl+V, o mantén pulsado y elige «Pegar».");return}
+  if(!t.trim()){toast("No hay nada copiado. Copia primero la respuesta en tu asistente de IA.");return}
+  const put=()=>{ta.value=t;ta.dispatchEvent(new Event("input",{bubbles:true}));toast("Respuesta pegada y guardada");ta.focus()};
+  if(ta.value.trim()&&ta.value.trim()!==t.trim())ask("¿Sustituir la respuesta guardada?","Ya hay una respuesta en este cuadro. Si continúas, se reemplazará por la que tienes copiada.","Sí, sustituir",put);
+  else put();
+}
+
+/* Recordatorio de copia de seguridad */
+const DAY=864e5;
+function checkBackupReminder(){
+  const box=$("#bkRemind"),u=store.ui,hasData=store.prospects.some(p=>!p.demo)||Object.keys(store.business).length;
+  const ref=Date.parse(u.lastBackup||u.firstUse||nowISO()),snooze=Date.parse(u.snooze||0)||0,now=Date.now();
+  const show=hasData&&now-ref>7*DAY&&now>snooze;
+  box.hidden=!show;
+  if(show)box.innerHTML=`<p><strong>${u.lastBackup?`Hace ${Math.floor((now-ref)/DAY)} días que no guardas una copia de seguridad.`:"Aún no has guardado ninguna copia de seguridad."}</strong> Tus datos solo están en este navegador: si borras su historial, se pierden.</p>
+    <div class="row-btns"><button type="button" class="btn primary" id="bkNow">Descargar copia ahora</button><button type="button" class="btn" id="bkLater">Recordármelo en 3 días</button></div>`;
+}
+function markBackup(){store.ui.lastBackup=nowISO();store.ui.snooze="";save();checkBackupReminder()}
+$("#bkRemind").addEventListener("click",e=>{
+  if(e.target.closest("#bkNow")){$("#bkDownload").click()}
+  else if(e.target.closest("#bkLater")){store.ui.snooze=new Date(Date.now()+3*DAY).toISOString();save();checkBackupReminder();toast("Te lo recordaré dentro de 3 días")}
+});
+$("#bkDownload").addEventListener("click",markBackup);$("#bkCopy").addEventListener("click",markBackup);
+
 /* ================= Estructura general ================= */
 function renderShell(){
   $("#nProspects").textContent=store.prospects.length;
   $("#nPrompts").textContent=all().length;$("#total").textContent=all().length;
   const sel=$("#selProspect");
-  sel.innerHTML=store.prospects.length?(store.active?"":`<option value="">Elige un prospecto</option>`)+store.prospects.map(p=>`<option value="${p.id}"${p.id===store.active?" selected":""}>${esc(pname(p))}${fullName(p)&&p.empresa.nombre?", "+esc(fullName(p)):""}</option>`).join(""):`<option value="">Aún no hay prospectos</option>`;
+  sel.innerHTML=store.prospects.length?(store.active?"":`<option value="">Elige una empresa</option>`)+store.prospects.map(p=>`<option value="${p.id}"${p.id===store.active?" selected":""}>${esc(pname(p))}${fullName(p)&&p.empresa.nombre?", "+esc(fullName(p)):""}</option>`).join(""):`<option value="">Aún no hay empresas</option>`;
   sel.disabled=!store.prospects.length;
   $("#nTasks").textContent=store.tasks.filter(t=>!t.done&&t.fecha&&t.fecha<=today()).length;
 }
@@ -3706,7 +3826,7 @@ function showView(v,setHash){
   if(setHash&&location.hash!=="#"+v){try{history.replaceState(null,"","#"+v)}catch(e){}}
   if(v==="sistema")renderSystem();else if(v==="panel")renderPanel();else if(v==="guia")renderGuide();else if(v==="prospectos")renderCRM();else{renderFilters();renderGrid();renderFinder()}
 }
-function renderAllViews(){applyTheme();renderShell();showView(store.ui.view,false)}
+function renderAllViews(){applyTheme();applySimple();renderShell();showView(store.ui.view,false)}
 $$(".tab").forEach(t=>t.addEventListener("click",e=>{e.preventDefault();showView(t.dataset.view,true);$("#main").scrollIntoView({block:"start"});t.focus()}));
 addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(VIEWS.includes(h))showView(h,false)});
 
@@ -3761,7 +3881,8 @@ $("#btnWipe").addEventListener("click",()=>{
 (async()=>{
   await loadStore();
   const h=location.hash.slice(1);if(VIEWS.includes(h))store.ui.view=h;
-  renderAllViews();maybeTour();
+  if(window.__full)store.ui.simple=false;
+  renderAllViews();maybeTour();checkBackupReminder();
   if(backend==="none")setSaveError("");
 })();
 
