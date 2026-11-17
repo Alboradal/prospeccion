@@ -517,6 +517,43 @@ a.btn:hover{color:var(--accent-strong)}
 .objlist{display:flex;flex-direction:column}
 .obj-body{padding:0 12px 12px;display:flex;flex-direction:column;gap:10px}
 .res-item summary .saved{color:var(--ok);font-weight:600}
+/* ===== Guía, ejemplo y visita guiada ===== */
+.gnav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.gnav .chip{text-decoration:none;color:var(--ink)}
+.gsec{scroll-margin-top:80px}
+.gsec>h3{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,3.4vw,2rem);margin-bottom:12px}
+.gsteps{display:grid;gap:10px;counter-reset:g}
+.gsteps li{counter-increment:g;display:grid;grid-template-columns:auto 1fr auto;gap:8px 14px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.gsteps li::before{content:counter(g);width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--on-accent);font-weight:700;display:grid;place-items:center}
+@media (max-width:640px){.gsteps li{grid-template-columns:auto 1fr}.gsteps li .go{grid-column:2}}
+.gtip{margin-top:12px;padding:12px 14px;border-radius:10px;background:var(--accent-soft)}
+.gdet{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:var(--surface)}
+.gdet summary{cursor:pointer;padding:14px 16px;font-weight:700;min-height:48px;display:flex;align-items:center}
+.gbody{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px;max-width:78ch}
+.gbody .btn.go{align-self:flex-start}
+.glist{list-style:disc;padding-left:22px;display:grid;gap:6px}
+ol.glist{list-style:decimal}
+.gpasos{list-style:none;display:grid;gap:8px}
+.gpasos li{padding:10px 12px;border-left:3px solid var(--accent);background:var(--surface-2);border-radius:0 10px 10px 0;transition:background .3s}
+.gpasos li.flash{background:var(--accent-soft)}
+.gcards{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));margin-bottom:12px}
+.gcards li{display:flex;flex-direction:column;gap:6px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.gcards span{color:var(--muted);font-size:.95rem}
+.gsearch{max-width:420px;margin-bottom:6px}
+.gsearch input{width:100%;min-height:46px;padding:10px 14px 10px 40px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface)}
+.glos{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));margin:0}
+.glos>div{padding:12px 14px;border:1px solid var(--line);border-radius:10px}
+.glos dt{font-weight:700}
+.glos dd{margin:4px 0 0;color:var(--muted);font-size:.95rem}
+.helplink{font-size:.92rem;padding:0;min-height:0}
+.tour{position:fixed;z-index:2147483646;width:min(340px,calc(100% - 16px));background:var(--surface);color:var(--ink);border:1px solid var(--line-strong);border-radius:14px;box-shadow:var(--shadow-lg);padding:16px;display:flex;flex-direction:column;gap:8px;animation:rise .25s ease both}
+.tour h2{font-family:var(--f-display);font-weight:400;font-size:1.6rem}
+.tour h2:focus{outline:none}
+.tour-n{font-size:.82rem;color:var(--muted);font-weight:600}
+.tour .row-btns{justify-content:flex-end;align-items:center}
+.tour .row-btns .link{margin-right:auto}
+.tour-hl{outline:3px solid var(--accent)!important;outline-offset:3px;position:relative;z-index:7;border-radius:10px}
+@media (max-width:1360px){.active-p label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}#selProspect{width:220px}}
 </style>
 </head>
 <body>
@@ -551,6 +588,7 @@ a.btn:hover{color:var(--accent-strong)}
       <a class="tab" href="#panel" data-view="panel">Panel <b id="nTasks" title="Acciones para hoy o vencidas">0</b></a>
       <a class="tab" href="#prospectos" data-view="prospectos">Prospectos <b id="nProspects">0</b></a>
       <a class="tab" href="#biblioteca" data-view="biblioteca">Biblioteca <b id="nPrompts">20</b></a>
+      <a class="tab" href="#guia" data-view="guia">Guía</a>
     </div>
     <div class="active-p">
       <label for="selProspect">Prospecto activo</label>
@@ -623,6 +661,10 @@ a.btn:hover{color:var(--accent-strong)}
         <button class="btn primary" id="crmEmptyBtn" type="button"></button>
       </div>
     </div>
+  </section>
+
+  <section class="view" id="view-guia" aria-labelledby="guiaH" hidden>
+    <div class="wrap" id="guideBody"></div>
   </section>
 
   <section class="view" id="view-biblioteca" aria-label="Biblioteca de prompts" hidden>
@@ -876,6 +918,8 @@ a.btn:hover{color:var(--accent-strong)}
     <div class="row"><button class="btn" id="bkClose" type="button">Cerrar</button><button class="btn" id="bkImport" type="button">Recuperar esta copia</button></div>
   </div>
 </dialog>
+
+<div class="tour" id="tour" role="dialog" aria-modal="false" aria-labelledby="tourT" hidden></div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1524,7 +1568,7 @@ function sanP(p){
   return {id:/^p[a-z0-9]{1,40}$/.test(p.id)?p.id:b.id,created:str(p.created,40)||b.created,updated:str(p.updated,40)||b.updated,
     estado:ESTADOS.includes(p.estado)?p.estado:"Nuevo",afinidad:["Alta","Media","Baja"].includes(p.afinidad)?p.afinidad:"",motivo:str(p.motivo,2000),
     empresa:flat(p.empresa),contacto:flat(p.contacto),score:flat(p.score,5000),notas:str(p.notas,50000),proxima:str(p.proxima,500),proximaFecha:str(p.proximaFecha,20),
-    inputs:sanInputs(p.inputs),results:sanNested(p.results,100000),savedAt:sanNested(p.savedAt,40),done:bools(p.done),touched:bools(p.touched),used:bools(p.used)};
+    inputs:sanInputs(p.inputs),results:sanNested(p.results,100000),savedAt:sanNested(p.savedAt,40),done:bools(p.done),touched:bools(p.touched),used:bools(p.used),demo:p.demo===true};
 }
 function sanitize2(o){
   o=obj(o);const s=blank();
@@ -1543,7 +1587,7 @@ function sanitize2(o){
   s.tasks=sanTasks(o.tasks).map(t=>{if(!ids.has(t.pid))t.pid="";return t});
   s.active=s.prospects.some(p=>p.id===o.active)?o.active:(s.prospects[0]?s.prospects[0].id:null);
   const ui=obj(o.ui);
-  s.ui={view:["sistema","panel","prospectos","biblioteca"].includes(ui.view)?ui.view:"sistema",step:Number.isInteger(ui.step)&&ui.step>=1&&ui.step<=10?ui.step:1,variants:flat(ui.variants,20)};
+  s.ui={view:["sistema","panel","prospectos","biblioteca","guia"].includes(ui.view)?ui.view:"sistema",step:Number.isInteger(ui.step)&&ui.step>=1&&ui.step<=10?ui.step:1,variants:flat(ui.variants,20),tourDone:ui.tourDone===true};
   return s;
 }
 /* Datos de la versión anterior (una sola ficha de prospecto y un perfil de 5 campos). */
@@ -2133,7 +2177,7 @@ function stepFoot(n){
 function renderStep(focus){
   const n=store.ui.step,s=stepDef(n),p=activeP(),st=stepState(n),v=curVariant(n),key=n;
   let h=`<header class="sc-head"><span class="sc-num" aria-hidden="true">${pad(n)}</span><div class="sc-t"><div class="meta"><span class="state is-${st}" id="scState">${STTXT[st]}</span><span class="tag">${isGlobal(n)?"Tu negocio":p?"Prospecto: "+esc(pname(p)):"Requiere un prospecto"}</span></div>
-    <h3 id="scTitle" tabindex="-1">Paso ${n}. ${esc(s.title)}</h3><p>${esc(s.purpose)}</p></div></header><div class="sc-body">
+    <h3 id="scTitle" tabindex="-1">Paso ${n}. ${esc(s.title)}</h3><p>${esc(s.purpose)} <button type="button" class="link helplink" data-act="help">Más ayuda sobre este paso<span class="sr"> en la Guía</span></button></p></div></header><div class="sc-body">
     <details class="help"><summary>Cómo hacer este paso</summary><ol>${s.help.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></details>`;
   if(!isGlobal(n)&&!p){
     h+=`<div class="empty-in"><p>Este paso trabaja sobre un prospecto concreto. Crea uno o elige uno de tu lista; también puedes registrar empresas en el paso 2.</p><div class="row-btns"><button type="button" class="btn primary" data-act="newp">Nuevo prospecto</button>${store.prospects.length?'<button type="button" class="btn" data-act="gocrm">Elegir en Prospectos</button>':'<button type="button" class="btn" data-act="go2">Ir al paso 2</button>'}</div></div></div>`+stepFoot(n);
@@ -2249,6 +2293,7 @@ card.addEventListener("click",e=>{
     const nx=$("#btnNext");if(rec.done[n]&&nx){nx.classList.remove("nudge");void nx.offsetWidth;nx.classList.add("nudge")}
   }
   else if(act==="newp")openPDialog(null,b);
+  else if(act==="help")openGuideStep(n);
   else if(act==="newint")openInt(activeP().id,b);
   else if(act==="sched")scheduleSeq(b);
   else if(act==="objlib")openObj(b);
@@ -2466,6 +2511,8 @@ function sanTasks(a){return (Array.isArray(a)?a:[]).slice(0,2000).map(t=>{t=obj(
   prioridad:PRIOS.includes(t.prioridad)?t.prioridad:"Media",tipo:TIPOS.includes(t.tipo)?t.tipo:"Otra",done:t.done===true,doneAt:str(t.doneAt,40),created:str(t.created,40)||nowISO()}}).filter(t=>t.titulo)}
 function sanInts(a){return (Array.isArray(a)?a:[]).slice(0,10000).map(x=>{x=obj(x);return {id:/^i[a-z0-9]{1,40}$/.test(x.id)?x.id:uid("i"),pid:typeof x.pid==="string"?x.pid:"",fecha:isoOk(x.fecha)||today(),
   canal:CANALES.includes(x.canal)?x.canal:"Otro",resultado:RESULTADOS.includes(x.resultado)?x.resultado:"Otro",notas:str(x.notas,5000),created:str(x.created,40)||nowISO()}}).filter(x=>x.pid)}
+const realP=()=>store.prospects.filter(p=>!p.demo);
+const realI=()=>{const s=new Set(realP().map(p=>p.id));return store.interactions.filter(x=>s.has(x.pid))};
 const intsOf=pid=>store.interactions.filter(x=>x.pid===pid).sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.created.localeCompare(a.created));
 const PW={Alta:0,Media:1,Baja:2};
 const sortTasks=l=>l.slice().sort((a,b)=>(a.fecha||"9999").localeCompare(b.fecha||"9999")||PW[a.prioridad]-PW[b.prioridad]);
@@ -2542,7 +2589,7 @@ function refreshAfterActivity(){
 
 /* ---------- Métricas ---------- */
 function metrics(){
-  const P=store.prospects,I=store.interactions,ix=e=>ESTADOS.indexOf(e);
+  const P=realP(),I=realI(),ix=e=>ESTADOS.indexOf(e);
   const contacted=new Set(I.map(x=>x.pid));
   const responded=new Set(I.filter(x=>RESPUESTA.has(x.resultado)).map(x=>x.pid));
   const meetings=new Set(P.filter(p=>[6,7,8].includes(ix(p.estado))).map(p=>p.id).concat(I.filter(x=>["Reunión conseguida","Propuesta enviada","Venta cerrada"].includes(x.resultado)).map(x=>x.pid)));
@@ -2566,13 +2613,13 @@ function weeks(n=8){
   const d=new Date(today()+"T12:00:00"),dow=(d.getDay()+6)%7;
   const start=addDays(today(),-dow-7*(n-1));
   const out=[];for(let i=0;i<n;i++){const a=addDays(start,7*i),b=addDays(a,6);out.push({a,b,c:0,r:0})}
-  for(const x of store.interactions){const w=out.find(w=>x.fecha>=w.a&&x.fecha<=w.b);if(w){if(x.canal!=="Reunión")w.c++;if(RESPUESTA.has(x.resultado))w.r++}}
+  for(const x of realI()){const w=out.find(w=>x.fecha>=w.a&&x.fecha<=w.b);if(w){if(x.canal!=="Reunión")w.c++;if(RESPUESTA.has(x.resultado))w.r++}}
   return out;
 }
 function evalPrompt(){
   const m=metrics(),w=weeks();
-  const est=ESTADOS.map(e=>`- ${e}: ${store.prospects.filter(p=>p.estado===e).length}`).join("\n");
-  const can=CANALES.map(c=>{const l=store.interactions.filter(x=>x.canal===c);return l.length?`- ${c}: ${l.length} interacciones, ${l.filter(x=>RESPUESTA.has(x.resultado)).length} con respuesta`:""}).filter(Boolean).join("\n")||"- Sin interacciones registradas.";
+  const est=ESTADOS.map(e=>`- ${e}: ${realP().filter(p=>p.estado===e).length}`).join("\n");
+  const can=CANALES.map(c=>{const l=realI().filter(x=>x.canal===c);return l.length?`- ${c}: ${l.length} interacciones, ${l.filter(x=>RESPUESTA.has(x.resultado)).length} con respuesta`:""}).filter(Boolean).join("\n")||"- Sin interacciones registradas.";
   const pct=v=>v===null?"sin datos suficientes":v+" %";
   return `Actúa como director comercial B2B. Analiza mi actividad de prospección y sugiéreme mejoras concretas.
 
@@ -2662,7 +2709,7 @@ function renderPanel(){
     </div>
   </div>
   <section class="panel-box" aria-labelledby="rsH">
-    <div class="pb-head"><h3 id="rsH">Resultados comerciales</h3><p class="small-note">Calculado solo con lo que has registrado en este navegador.</p></div>
+    <div class="pb-head"><h3 id="rsH">Resultados comerciales</h3><p class="small-note">Calculado solo con lo que has registrado en este navegador${store.prospects.some(p=>p.demo)?". El ejemplo para practicar no cuenta":""}.</p></div>
     <div class="funnel">
       ${[["Prospectos identificados",m.prospectos],["Empresas investigadas",m.investigadas],["Contactos realizados",m.contactos],["Emails enviados",m.emails],["Llamadas realizadas",m.llamadas],["Respuestas recibidas",m.respuestas],["Reuniones conseguidas",m.reuniones],["Oportunidades abiertas",m.abiertas],["Ventas cerradas",m.ventas]].map(([l,n])=>`<div><dt>${l}</dt><dd>${n}</dd></div>`).join("")}
     </div>
@@ -3365,6 +3412,266 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change",applyTheme)
 
 
 
+/* ================= Guía de uso, ejemplo y visita guiada ================= */
+const GO={
+  "s1":["Ir al paso 1",()=>{showView("sistema",true);goStep(1,true)}],"s2":["Ir al paso 2",()=>{showView("sistema",true);goStep(2,true)}],
+  "s3":["Ir al paso 3",()=>{showView("sistema",true);goStep(3,true)}],"sistema":["Ir a Mi sistema",()=>showView("sistema",true)],
+  "panel":["Ir al Panel",()=>showView("panel",true)],"prospectos":["Ir a Prospectos",()=>showView("prospectos",true)],
+  "biblioteca":["Ir a la Biblioteca",()=>showView("biblioteca",true)],"email":["Abrir el analizador de emails",b=>openTool("email",b)],
+  "obj":["Abrir la biblioteca de objeciones",b=>openObj(b)],"backup":["Abrir la copia de seguridad",()=>$("#btnBackup").click()],
+  "newint":["Registrar una interacción",b=>openInt(null,b)],"demo":["Cargar el ejemplo",b=>toggleDemo(b)]
+};
+const goBtn=k=>`<button type="button" class="btn go" data-go="${k}">${GO[k][0]}</button>`;
+const STEPHELP={
+  1:"Cuentas qué vendes, a quién y por qué te eligen. Es como presentarte a un compañero nuevo: si no lo explicas bien, nadie podrá venderlo por ti, tampoco la IA. Basta con producto, problema que resuelves y cliente ideal para empezar.",
+  2:"Describes cómo es tu cliente perfecto y apuntas las empresas que se le parecen. Cada empresa que añadas se convierte en una ficha de prospecto. Si pides a la IA que te sugiera empresas, comprueba que existen antes de apuntarlas.",
+  3:"Reúnes lo que sabes de la empresa y pides a la IA un análisis. La respuesta separa lo comprobado de lo supuesto. Guárdala: todos los pasos siguientes la usan.",
+  4:"Apuntas quién es la persona con la que quieres hablar y la IA te ayuda a entender qué le preocupa y cómo dirigirte a ella. El email y el teléfono se quedan en la ficha y nunca se envían a la IA.",
+  5:"Das una nota de 0 a 100 a la oportunidad, con seis criterios. Es como mirar el tiempo antes de salir: no garantiza nada, pero te ayuda a decidir dónde invertir tu tiempo.",
+  6:"Decides qué vas a decir, por qué canal y qué quieres conseguir. La IA te propone tres enfoques: ahorro, productividad y crecimiento.",
+  7:"La IA redacta los primeros mensajes para los canales que elijas, cada uno en tres versiones. Revísalos y adáptalos a tu forma de escribir antes de enviarlos.",
+  8:"Preparas el guion de la llamada y puedes ensayarla: la IA hace de cliente y, al terminar, te puntúa y te da consejos. Es como un simulador de vuelo para comerciales.",
+  9:"Preparas respuestas a las objeciones habituales y una secuencia de seguimientos. Con un botón, los seguimientos se convierten en tareas con fecha en tu Panel.",
+  10:"Preparas la reunión y, al terminar, apuntas el resultado y el siguiente paso. Así la ficha y tus métricas quedan al día."
+};
+const GLOSARIO=[
+  ["Asistente de IA","Programa al que le escribes y te responde, como ChatGPT, Claude o Gemini. Esta web prepara lo que le vas a pedir; la respuesta la obtienes allí."],
+  ["Canal","Medio por el que contactas: email, LinkedIn, teléfono, WhatsApp o en persona."],
+  ["Cliente ideal","Retrato del tipo de empresa y de persona que más se beneficia de lo que vendes. También se llama ICP, por sus siglas en inglés."],
+  ["Contexto","Toda la información que acompaña a una petición: tu negocio, la empresa, la persona y lo que ya sabes. Cuanto mejor es el contexto, mejor responde la IA."],
+  ["Copia de seguridad","Archivo con todos tus datos de la plataforma. Sirve para no perderlos y para pasarlos a otro navegador u ordenador."],
+  ["CRM","Herramienta donde se guarda la información de los clientes y de cada contacto con ellos. La pestaña Prospectos funciona como un CRM sencillo."],
+  ["Decisor","Persona que tiene la última palabra en la compra o que controla el presupuesto."],
+  ["Disparador","Algo que ha pasado en la empresa o en su sector y que hace oportuno contactar ahora: un cargo nuevo, una expansión o una ley que cambia, por ejemplo."],
+  ["Embudo","Forma de ver el proceso comercial: entran muchos prospectos y, paso a paso, menos llegan a reunión y a venta. Como un embudo de cocina."],
+  ["Enfoque","El ángulo principal de tu mensaje: ahorrar dinero, ganar productividad o crecer."],
+  ["Estado del prospecto","En qué punto está la relación: nuevo, investigado, contactado, en conversación, reunión conseguida, ganado, perdido…"],
+  ["Estrategia comercial","Plan para acercarte a un prospecto: qué problema destacar, qué beneficio ofrecer, por qué canal y qué quieres conseguir."],
+  ["Hecho verificado","Dato que se puede comprobar en una fuente concreta, como la web de la empresa o una noticia con fecha."],
+  ["Hipótesis","Suposición razonable que todavía no está comprobada. Es útil, pero no debes presentarla como un hecho."],
+  ["Influyente","Persona que no decide la compra, pero cuya opinión pesa en la decisión."],
+  ["Interacción","Cada contacto con un prospecto: un email, una llamada, un mensaje o una reunión. Registrarlas alimenta tus métricas."],
+  ["Llamada a la acción","La petición concreta con la que acaba un mensaje, por ejemplo: «¿Te va bien hablar 15 minutos el jueves?»."],
+  ["Objeción","Motivo que da el prospecto para no avanzar, como «no tenemos presupuesto» o «ya tenemos proveedor». No siempre es un no definitivo."],
+  ["Prioridad","Resultado de la puntuación: alta de 80 a 100, media de 60 a 79 y baja por debajo de 60."],
+  ["Prompt","Las instrucciones que le das a un asistente de IA. Esta plataforma las escribe por ti con tus datos."],
+  ["Propuesta de valor","Frase que explica qué haces, para quién y qué resultado obtiene. Es la respuesta corta a «¿y por qué debería escucharte?»."],
+  ["Prospección","Buscar y contactar empresas que podrían convertirse en clientes."],
+  ["Prospecto","Empresa o persona que podría ser cliente pero todavía no lo es."],
+  ["Prospecto activo","El prospecto con el que estás trabajando ahora. Se elige arriba, junto a las pestañas, y todos los prompts usan sus datos."],
+  ["Puntuación de la oportunidad","Nota de 0 a 100 que das a un prospecto con seis criterios. Es orientativa, no una predicción."],
+  ["Segmento","Grupo de empresas parecidas, por sector, tamaño o zona."],
+  ["Secuencia","Serie planificada de contactos de seguimiento, con días entre uno y otro."],
+  ["Seguimiento","Volver a contactar a alguien que no ha respondido, aportando algo nuevo cada vez."],
+  ["Tasa de conversión","Porcentaje de prospectos que pasan de una etapa a la siguiente. Por ejemplo, de cada 10 contactados, cuántos llegan a reunión."],
+  ["Tasa de respuesta","Porcentaje de prospectos contactados que han respondido, aunque sea para decir que no."]
+];
+const FAQ=[
+  ["¿Necesito saber de inteligencia artificial o de prompts?","No. La plataforma escribe las instrucciones por ti. Tú rellenas los datos que conoces, copias el texto y lo pegas en tu asistente de IA.",""],
+  ["¿Esta web usa la IA por mí?","No. Prepara y copia las instrucciones, pero no se conecta con ChatGPT, Claude ni ningún otro asistente. Por eso copias el prompt, lo pegas en tu asistente y traes aquí la respuesta. Conectarla directamente exigiría un servidor y un servicio de pago que ahora no tiene.",""],
+  ["¿Qué asistente de IA debo usar?","El que prefieras: ChatGPT, Claude, Gemini u otro. Para investigar empresas conviene uno que pueda buscar en internet; si no puede, pega en él el texto de la web o de las noticias.",""],
+  ["¿Dónde se guardan mis datos?","Solo en el navegador que estás usando, en este dispositivo. No se envían a ningún servidor ni los ve nadie más.","backup"],
+  ["¿Puedo usarla en el móvil y en el ordenador a la vez?","Sí, pero cada uno guarda sus propios datos: no se sincronizan. Para pasar tus datos, descarga una copia de seguridad en uno y recupérala en el otro.","backup"],
+  ["¿Puedo perder mis datos?","Sí, si borras los datos de navegación, usas el modo incógnito o cambias de navegador. Descarga una copia de seguridad de vez en cuando.","backup"],
+  ["¿Qué hago si la IA se inventa algo?","Comprueba siempre los datos antes de usarlos. Los prompts piden a la IA que marque qué es un hecho, qué es una hipótesis y qué no sabe, pero puede equivocarse igualmente. Nunca envíes a un cliente algo que no hayas verificado.",""],
+  ["¿Tengo que rellenar todos los campos?","No. Rellena lo que sepas. Si falta algo importante, la plataforma te avisa y el prompt pide a la IA que no lo suponga.",""],
+  ["¿Tengo que seguir los pasos en orden?","Es lo recomendable, porque cada paso aprovecha lo anterior, pero puedes saltar a cualquiera. Si dudas, pulsa «¿Qué tengo que hacer ahora?» en Mi sistema.","sistema"],
+  ["¿Cómo trabajo con varios prospectos a la vez?","Cada empresa tiene su ficha. Elige el prospecto activo en el selector de arriba y todo, el recorrido y los prompts, se adapta a él.","prospectos"],
+  ["¿Qué significa la puntuación de 0 a 100?","Es una valoración tuya, con ayuda de la IA si quieres, para decidir dónde poner tu tiempo. No predice si vas a vender. Si faltan criterios por puntuar, aparece como provisional.",""],
+  ["¿Por qué cambia solo el estado de un prospecto?","Para ahorrarte trabajo: al completar la investigación pasa a «Investigado», al preparar los mensajes a «Contacto preparado» y al registrar respuestas o reuniones avanza en consecuencia. Nunca retrocede solo y siempre puedes cambiarlo a mano.",""],
+  ["¿Cómo se calculan las métricas del Panel?","Solo con lo que registras: prospectos, estados e interacciones. Si no registras tus contactos, el Panel no puede saberlos. El ejemplo para practicar no cuenta en las métricas.","panel"],
+  ["¿Puedo crear mis propios prompts?","Sí. En la Biblioteca, «Añadir prompt». Si escribes un dato entre corchetes, como [Sector], se convierte en un campo para rellenar.","biblioteca"],
+  ["¿Cómo empiezo de cero?","Al pie de la página, «Borrar datos guardados». Te pedirá confirmación y no se puede deshacer, así que descarga antes una copia si quieres conservar algo.",""],
+  ["¿Necesito una cuenta o pagar algo?","Esta web no pide cuenta ni pago. Tu asistente de IA puede tener su propio plan gratuito o de pago.",""]
+];
+
+function guideHTML(){
+  const hasDemo=store.prospects.some(p=>p.demo);
+  return `<div class="sys-head"><div><h2 id="guiaH">Guía de uso</h2><p class="muted">Todo lo que necesitas para sacarle partido a la plataforma, explicado sin tecnicismos.</p></div>
+    <div class="row-btns"><button type="button" class="btn" id="btnTour">Repetir la visita guiada</button><button type="button" class="btn primary" data-go="demo" id="btnDemo">${hasDemo?"Quitar el ejemplo":"Cargar un ejemplo para practicar"}</button></div></div>
+  <nav class="gnav" aria-label="Apartados de la guía">${[["g-empieza","Empieza en 5 minutos"],["g-como","Cómo funciona"],["g-benef","Beneficios"],["g-nohace","Lo que no hace"],["g-priv","Privacidad"],["g-glos","Glosario"],["g-faq","Preguntas frecuentes"]].map(([i,l])=>`<a class="chip" href="#${i}" data-anchor="${i}">${l}</a>`).join("")}</nav>
+
+  <section class="panel gsec" id="g-empieza" aria-labelledby="g-empieza-h"><h3 id="g-empieza-h">Empieza en 5 minutos</h3>
+    <ol class="gsteps">
+      <li><div><strong>Cuéntanos tu negocio.</strong> Rellena al menos qué vendes, qué problema resuelves y a quién. Solo se hace una vez.</div>${goBtn("s1")}</li>
+      <li><div><strong>Apunta 2 o 3 empresas.</strong> Las que crees que podrían necesitarte. Cada una tendrá su ficha.</div>${goBtn("s2")}</li>
+      <li><div><strong>Investiga una.</strong> Pulsa «Generar instrucciones para IA», copia el texto en tu asistente y pega aquí su respuesta.</div>${goBtn("s3")}</li>
+      <li><div><strong>Déjate guiar.</strong> Cuando no sepas qué hacer, pulsa «¿Qué tengo que hacer ahora?» en Mi sistema.</div>${goBtn("sistema")}</li>
+      <li><div><strong>Apunta cada contacto.</strong> Cada email, llamada o reunión, con «Registrar interacción». Tu Panel te dirá qué toca y cómo vas.</div>${goBtn("panel")}</li>
+    </ol>
+    <p class="gtip">¿Prefieres verlo funcionando antes de usar tus datos? Carga el ejemplo para practicar: es una empresa inventada con los pasos ya rellenados y se quita con un clic.</p>
+  </section>
+
+  <section class="panel gsec" id="g-como" aria-labelledby="g-como-h"><h3 id="g-como-h">Cómo funciona</h3>
+    <details class="gdet" open><summary>Qué es esta plataforma</summary><div class="gbody">
+      <p>Es un ayudante para preparar tu prospección comercial. Piensa en ella como el copiloto que lleva el mapa: no conduce por ti, pero te dice qué viene después y tiene a mano todo lo que has apuntado.</p>
+      <p>Funciona en tres tiempos que se repiten:</p>
+      <ol class="glist"><li><strong>Rellenas</strong> lo que sabes: tu negocio, la empresa, la persona.</li><li><strong>Copias</strong> las instrucciones que la plataforma prepara con esos datos y las pegas en tu asistente de IA.</li><li><strong>Guardas</strong> aquí la respuesta, y el siguiente paso la aprovecha.</li></ol>
+      <p>Así cada prompt sabe todo lo anterior sin que tengas que repetirlo, como una carpeta del cliente que va pasando de mano en mano.</p></div></details>
+    <details class="gdet" id="g-recorrido"><summary>El recorrido de 10 pasos</summary><div class="gbody">
+      <p>Es el corazón de la plataforma, en la pestaña Mi sistema. Los pasos 1 y 2 son sobre tu negocio y se hacen una vez. Los pasos 3 a 10 se repiten con cada empresa.</p>
+      <p>Cada paso tiene una ayuda, unos campos, un botón para generar las instrucciones, un espacio para pegar la respuesta y un botón para marcarlo como completado. En la barra de pasos ves cuáles están <strong>pendientes</strong>, <strong>en curso</strong> o <strong>completados</strong>.</p>
+      <ol class="gpasos">${STEPS.map(s=>`<li id="gp-${s.n}" tabindex="-1"><strong>Paso ${s.n}. ${esc(s.title)}.</strong> ${esc(STEPHELP[s.n])}</li>`).join("")}</ol>
+      ${goBtn("sistema")}</div></details>
+    <details class="gdet"><summary>El día a día: Panel y Prospectos</summary><div class="gbody">
+      <p><strong>Prospectos</strong> es tu archivador: una ficha por empresa con sus datos, la investigación, la puntuación, los mensajes, el historial de contactos y el estado. Puedes buscar, filtrar por estado y ordenar.</p>
+      <p><strong>Panel</strong> es tu mesa de trabajo de cada mañana:</p>
+      <ul class="glist"><li>«Mis próximas acciones»: lo que tienes que hacer, ordenado por fecha y prioridad. Las vencidas salen en rojo.</li><li>Últimas actividades y empresas prioritarias.</li><li>Resultados: cuántos contactos, respuestas y reuniones llevas, y qué porcentaje avanza de una etapa a otra.</li></ul>
+      <p>La clave es <strong>registrar cada contacto</strong>. Es como anotar los gastos: si no apuntas, a final de mes no sabes en qué se fue el dinero.</p>
+      <div class="row-btns">${goBtn("panel")}${goBtn("prospectos")}${goBtn("newint")}</div></div></details>
+    <details class="gdet"><summary>La Biblioteca y las herramientas</summary><div class="gbody">
+      <p>La <strong>Biblioteca</strong> tiene 20 prompts listos para situaciones concretas: un buzón de voz, un email que no ha tenido respuesta, una revisión antes de enviar… Puedes buscarlos, filtrarlos por momento de uso y dificultad, marcarlos como favoritos y crear los tuyos.</p>
+      <p>Las <strong>herramientas</strong> son atajos para tareas frecuentes:</p>
+      <ul class="glist"><li><strong>Analizador de emails:</strong> pegas lo que te ha respondido un cliente y te ayuda a contestar.</li><li><strong>Analizador de competencia:</strong> compara tu propuesta con las alternativas del cliente, con datos que se puedan comprobar.</li><li><strong>Biblioteca de objeciones:</strong> preparas y guardas tus mejores respuestas a los «no» habituales.</li></ul>
+      <div class="row-btns">${goBtn("biblioteca")}${goBtn("email")}${goBtn("obj")}</div></div></details>
+  </section>
+
+  <section class="panel gsec" id="g-benef" aria-labelledby="g-benef-h"><h3 id="g-benef-h">Qué ganas usándola</h3>
+    <ul class="gcards">
+      <li><strong>Menos tiempo preparando.</strong><span>Escribes los datos una vez y todos los prompts los aprovechan. Por ejemplo, el guion de la llamada ya conoce la investigación y la estrategia: no tienes que volver a explicárselas a la IA.</span></li>
+      <li><strong>Mensajes que suenan a ti y al cliente.</strong><span>Cada mensaje se apoya en algo concreto de esa empresa y no en frases que valen para todos. Un email que menciona su nueva planta de Vigo no se lee igual que uno genérico.</span></li>
+      <li><strong>Ningún seguimiento olvidado.</strong><span>Las próximas acciones tienen fecha y el Panel te avisa de las vencidas. Muchos clientes responden al segundo o tercer contacto.</span></li>
+      <li><strong>Llegas preparado.</strong><span>Antes de llamar puedes ensayar con la IA haciendo de cliente difícil y tener pensadas las respuestas a las objeciones.</span></li>
+      <li><strong>Sabes qué funciona.</strong><span>Con tus propios números ves dónde se queda la gente: si contactas mucho y responden poco, el problema está en el primer mensaje, no en la llamada.</span></li>
+      <li><strong>Un método que se repite.</strong><span>Siempre los mismos pasos, en el mismo orden. Es más fácil ser constante y enseñárselo a otra persona del equipo.</span></li>
+    </ul>
+    <p class="small-note">Los resultados dependen de tu mercado, de tu oferta y de tu constancia. La plataforma te ayuda a trabajar con orden; no garantiza ventas.</p>
+  </section>
+
+  <section class="panel gsec" id="g-nohace" aria-labelledby="g-nohace-h"><h3 id="g-nohace-h">Lo que la plataforma no hace</h3>
+    <ul class="glist">
+      <li><strong>No usa la IA por ti.</strong> Prepara y copia las instrucciones; la respuesta la obtienes en tu asistente.</li>
+      <li><strong>No consulta LinkedIn, webs ni tu CRM.</strong> Trabaja con lo que tú escribes o pegas.</li>
+      <li><strong>No envía emails ni mensajes.</strong> Los mensajes los envías tú desde tu correo o tu LinkedIn.</li>
+      <li><strong>No sincroniza entre dispositivos.</strong> Cada navegador guarda sus datos; usa la copia de seguridad para moverlos.</li>
+      <li><strong>No comprueba lo que dice la IA.</strong> Verificar los datos es cosa tuya.</li>
+      <li><strong>No es un CRM de empresa.</strong> Está pensada para una persona: no tiene usuarios, equipos ni conexiones con otros programas.</li>
+    </ul>
+  </section>
+
+  <section class="panel gsec" id="g-priv" aria-labelledby="g-priv-h"><h3 id="g-priv-h">Consejos de privacidad</h3>
+    <ul class="glist">
+      <li>Guarda solo datos profesionales que necesites: nombre, cargo, empresa, email y teléfono de trabajo.</li>
+      <li>No guardes datos personales delicados (salud, familia, opiniones), contraseñas ni datos bancarios.</li>
+      <li>El email y el teléfono del contacto se quedan en su ficha: la plataforma no los incluye en los prompts.</li>
+      <li>Antes de pegar un prompt en tu asistente de IA, repásalo y quita lo que sea confidencial de tu empresa o del cliente.</li>
+      <li>Revisa en tu asistente de IA si usa tus conversaciones para entrenarse y cómo desactivarlo si lo prefieres.</li>
+      <li>Si usas un ordenador compartido, descarga tu copia de seguridad y borra los datos al terminar.</li>
+      <li>Al contactar con profesionales se aplican las normas de protección de datos, como el RGPD en Europa. Si tienes dudas sobre tu caso, consúltalo con tu asesor.</li>
+    </ul>
+  </section>
+
+  <section class="panel gsec" id="g-glos" aria-labelledby="g-glos-h"><h3 id="g-glos-h">Glosario</h3>
+    <div class="search gsearch"><label class="sr" for="glosQ">Buscar en el glosario</label><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg><input id="glosQ" type="search" placeholder="Buscar un término" autocomplete="off"></div>
+    <p class="status" id="glosStatus" role="status" aria-live="polite"></p>
+    <dl class="glos" id="glosList"></dl>
+  </section>
+
+  <section class="panel gsec" id="g-faq" aria-labelledby="g-faq-h"><h3 id="g-faq-h">Preguntas frecuentes</h3>
+    <div class="search gsearch"><label class="sr" for="faqQ">Buscar en las preguntas frecuentes</label><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.500-3.500"/></svg><input id="faqQ" type="search" placeholder="Buscar una pregunta" autocomplete="off"></div>
+    <p class="status" id="faqStatus" role="status" aria-live="polite"></p>
+    <div id="faqList"></div>
+  </section>`;
+}
+function renderGlos(){
+  const q=norm($("#glosQ").value.trim()),l=GLOSARIO.filter(([t,d])=>!q||norm(t+" "+d).includes(q));
+  $("#glosList").innerHTML=l.map(([t,d])=>`<div><dt>${esc(t)}</dt><dd>${esc(d)}</dd></div>`).join("");
+  $("#glosStatus").textContent=l.length?(q?`${l.length} términos encontrados.`:""):`Ningún término coincide con «${$("#glosQ").value.trim()}».`;
+}
+function renderFaq(){
+  const q=norm($("#faqQ").value.trim()),l=FAQ.filter(([a,b])=>!q||norm(a+" "+b).includes(q));
+  $("#faqList").innerHTML=l.map(([a,b,g])=>`<details class="gdet"><summary>${esc(a)}</summary><div class="gbody"><p>${esc(b)}</p>${g?goBtn(g):""}</div></details>`).join("");
+  $("#faqStatus").textContent=l.length?(q?`${l.length} preguntas encontradas.`:""):`Ninguna pregunta coincide con «${$("#faqQ").value.trim()}». Prueba con otra palabra o consulta el glosario.`;
+}
+function renderGuide(){
+  $("#guideBody").innerHTML=guideHTML();renderGlos();renderFaq();
+  $("#glosQ").addEventListener("input",renderGlos);$("#faqQ").addEventListener("input",renderFaq);
+}
+$("#guideBody").addEventListener("click",e=>{
+  const g=e.target.closest("[data-go]"),a=e.target.closest("[data-anchor]");
+  if(g){GO[g.dataset.go][1](g)}
+  else if(a){e.preventDefault();const t=$("#"+a.dataset.anchor);t.scrollIntoView({block:"start"});const h=$("h3",t);h.tabIndex=-1;h.focus({preventScroll:true})}
+  else if(e.target.closest("#btnTour")){startTour(true)}
+});
+function openGuideStep(n){
+  showView("guia",true);
+  const d=$("#g-recorrido");d.open=true;
+  const li=$("#gp-"+n);li.classList.add("flash");li.scrollIntoView({block:"center"});li.focus({preventScroll:true});
+  setTimeout(()=>li.classList.remove("flash"),1600);
+}
+
+/* ---------- Ejemplo para practicar ---------- */
+function demoProspect(){
+  const p=BLANKP(),d=n=>addDays(today(),n);
+  p.demo=true;p.estado="Contacto preparado";p.afinidad="Alta";p.motivo="Ejemplo ficticio para practicar";
+  p.empresa={nombre:"Conservas del Atlántico (ejemplo)",web:"https://ejemplo.invalid",sector:"Alimentación",actividad:"Fabricación de conservas de pescado",tamano:"Mediana (unas 120 personas)",ubicacion:"Galicia",
+    noticias:"[Ejemplo ficticio] Anunció una nueva línea de producto para exportación.",problemas:"[Ejemplo ficticio] Posibles roturas de stock en temporada alta."};
+  p.contacto={nombre:"Lucía",apellidos:"Ejemplo",cargo:"Directora de Operaciones",departamento:"Operaciones",influencia:"Alta",responsabilidad:"Decide la compra"};
+  p.score={icp:"22",necesidad:"16",economica:"12",acceso:"10",momento:"11",estrategico:"7",justificacion:"[Ejemplo ficticio] Encaja con el cliente ideal y hay una señal clara: la nueva línea de exportación."};
+  const R={3:{inv:"[Ejemplo ficticio de respuesta de la IA]\n1. Resumen: fabricante mediano de conservas que prepara su salida a nuevos mercados. [Hipótesis]\n2. Necesidad potencial: planificar mejor la producción en temporada alta. [Hipótesis]\n10. Fuentes: en un caso real, aquí irían los enlaces."},
+    4:{dec:"[Ejemplo ficticio] Lucía probablemente responde de la planificación y del cumplimiento de plazos. Enfoque recomendado: directo y con datos."},
+    6:{est:"[Ejemplo ficticio] Argumento principal: evitar roturas de stock en la nueva línea. Canal: email y después llamada. Objetivo: llamada de 20 minutos."},
+    7:{msg:"[Ejemplo ficticio]\nAsunto: La nueva línea de exportación\nHola, Lucía: con la nueva línea, la temporada alta suele tensar la planificación. ¿Te encaja hablar 20 minutos el jueves?"}};
+  for(const n in R){p.results[n]=R[n];p.savedAt[n]=Object.fromEntries(Object.keys(R[n]).map(k=>[k,nowISO()]));p.done[n]=true}
+  p.done[5]=true;
+  return p;
+}
+function toggleDemo(btn){
+  const has=store.prospects.some(p=>p.demo);
+  if(has){
+    const ids=new Set(store.prospects.filter(p=>p.demo).map(p=>p.id));
+    store.prospects=store.prospects.filter(p=>!p.demo);store.interactions=store.interactions.filter(x=>!ids.has(x.pid));store.tasks=store.tasks.filter(t=>!ids.has(t.pid));
+    if(ids.has(store.active))store.active=store.prospects[0]?store.prospects[0].id:null;
+    save();renderShell();renderGuide();toast("Ejemplo eliminado");$("#btnDemo").focus();return;
+  }
+  const p=demoProspect();
+  store.prospects.unshift(p);store.active=p.id;
+  store.interactions.push({id:uid("i"),pid:p.id,fecha:addDays(today(),-6),canal:"Email",resultado:"Sin respuesta todavía",notas:"Ejemplo ficticio",created:nowISO()},
+    {id:uid("i"),pid:p.id,fecha:addDays(today(),-2),canal:"LinkedIn",resultado:"Respuesta recibida",notas:"Ejemplo ficticio: pide que la llamen la semana que viene",created:nowISO()});
+  store.tasks.push({id:uid("t"),titulo:"Llamar a Lucía (ejemplo)",pid:p.id,fecha:addDays(today(),1),prioridad:"Alta",tipo:"Llamada",done:false,doneAt:"",created:nowISO()});
+  save();renderShell();renderGuide();
+  toast("Ejemplo cargado y activo. No cuenta en tus métricas.");
+  showView("sistema",true);goStep(firstOpen(p)||8,true);
+}
+
+/* ---------- Visita guiada ---------- */
+const TOUR=[
+  ['.tab[data-view="sistema"]',"Mi sistema","El recorrido de 10 pasos, de definir tu negocio a conseguir la reunión. Empieza por aquí."],
+  ['.tab[data-view="panel"]',"Panel","Tus próximas acciones, tu actividad y tus resultados."],
+  ['.tab[data-view="prospectos"]',"Prospectos","La ficha de cada empresa: datos, investigación, estado e historial de contactos."],
+  ['.tab[data-view="biblioteca"]',"Biblioteca","20 prompts listos y herramientas como el analizador de emails o la biblioteca de objeciones."],
+  ["#selProspect","Prospecto activo","Elige aquí con qué empresa trabajas. Todos los prompts usan sus datos."],
+  ['.tab[data-view="guia"]',"Guía","Si tienes dudas, aquí está todo explicado, con glosario y preguntas frecuentes. También puedes cargar un ejemplo para practicar."]];
+let tourI=-1,tourFrom=null;
+function startTour(manual){tourFrom=manual?document.activeElement:null;tourI=0;showTourStep()}
+function endTour(){
+  const t=$("#tour");t.hidden=true;$$(".tour-hl").forEach(x=>x.classList.remove("tour-hl"));tourI=-1;
+  store.ui.tourDone=true;save();if(tourFrom&&tourFrom.isConnected)tourFrom.focus();tourFrom=null;
+}
+function placeTour(){
+  if(tourI<0)return;
+  const el=$(TOUR[tourI][0]),t=$("#tour");if(!el)return;
+  const r=el.getBoundingClientRect(),w=t.offsetWidth,h=t.offsetHeight;
+  let top=r.bottom+12;if(top+h>innerHeight-8)top=Math.max(8,r.top-h-12);
+  t.style.top=top+"px";t.style.left=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2))+"px";
+}
+function showTourStep(){
+  const[sel,title,text]=TOUR[tourI],el=$(sel),t=$("#tour");
+  $$(".tour-hl").forEach(x=>x.classList.remove("tour-hl"));
+  if(el){el.classList.add("tour-hl");el.scrollIntoView({block:"nearest"})}
+  t.innerHTML=`<p class="tour-n">${tourI+1} de ${TOUR.length}</p><h2 id="tourT" tabindex="-1">${title}</h2><p>${text}</p>
+    <div class="row-btns"><button type="button" class="link" data-tour="skip">Saltar la visita</button>${tourI?'<button type="button" class="btn" data-tour="prev">Anterior</button>':""}<button type="button" class="btn primary" data-tour="next">${tourI===TOUR.length-1?"Terminar":"Siguiente"}</button></div>`;
+  t.hidden=false;placeTour();$("#tourT").focus();
+}
+$("#tour").addEventListener("click",e=>{
+  const b=e.target.closest("[data-tour]");if(!b)return;
+  const a=b.dataset.tour;
+  if(a==="skip")endTour();else if(a==="prev"){tourI--;showTourStep()}else if(tourI<TOUR.length-1){tourI++;showTourStep()}else endTour();
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&tourI>=0&&!$("dialog[open]")){e.preventDefault();endTour()}});
+addEventListener("resize",placeTour);addEventListener("scroll",placeTour,{passive:true});
+function maybeTour(){if(!store.ui.tourDone&&!window.__noTour&&!store.prospects.length&&!Object.keys(store.business).length)setTimeout(()=>startTour(false),700)}
+
 /* ================= Estructura general ================= */
 function renderShell(){
   $("#nProspects").textContent=store.prospects.length;
@@ -3374,14 +3681,14 @@ function renderShell(){
   sel.disabled=!store.prospects.length;
   $("#nTasks").textContent=store.tasks.filter(t=>!t.done&&t.fecha&&t.fecha<=today()).length;
 }
-const VIEWS=["sistema","panel","prospectos","biblioteca"];
+const VIEWS=["sistema","panel","prospectos","biblioteca","guia"];
 function showView(v,setHash){
   if(!VIEWS.includes(v))v="sistema";
   store.ui.view=v;save();
   VIEWS.forEach(x=>$("#view-"+x).hidden=x!==v);
   $$(".tab").forEach(t=>{if(t.dataset.view===v)t.setAttribute("aria-current","page");else t.removeAttribute("aria-current")});
   if(setHash&&location.hash!=="#"+v){try{history.replaceState(null,"","#"+v)}catch(e){}}
-  if(v==="sistema")renderSystem();else if(v==="panel")renderPanel();else if(v==="prospectos")renderCRM();else{renderFilters();renderGrid();renderFinder()}
+  if(v==="sistema")renderSystem();else if(v==="panel")renderPanel();else if(v==="guia")renderGuide();else if(v==="prospectos")renderCRM();else{renderFilters();renderGrid();renderFinder()}
 }
 function renderAllViews(){applyTheme();renderShell();showView(store.ui.view,false)}
 $$(".tab").forEach(t=>t.addEventListener("click",e=>{e.preventDefault();showView(t.dataset.view,true);$("#main").scrollIntoView({block:"start"});t.focus()}));
@@ -3438,7 +3745,7 @@ $("#btnWipe").addEventListener("click",()=>{
 (async()=>{
   await loadStore();
   const h=location.hash.slice(1);if(VIEWS.includes(h))store.ui.view=h;
-  renderAllViews();
+  renderAllViews();maybeTour();
   if(backend==="none")setSaveError("");
 })();
 
