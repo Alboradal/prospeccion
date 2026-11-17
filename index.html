@@ -503,6 +503,20 @@ dialog[open]{animation:open .26s cubic-bezier(.2,.8,.2,1)}
 a.btn{color:var(--ink);text-decoration:none}
 a.btn:hover{color:var(--accent-strong)}
 @media (max-width:480px){.tabs{flex-wrap:wrap;overflow:visible}.kpis{grid-template-columns:1fr 1fr}.kn{font-size:2.1rem}.kpi{padding:12px}}
+/* ===== Fase 3: herramientas ===== */
+.tools-h{font-family:var(--f-display);font-weight:400;font-size:clamp(1.7rem,3.6vw,2.2rem)}
+.toolgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));margin-top:14px}
+.toolcard{width:100%;height:100%;display:flex;gap:12px;align-items:flex-start;text-align:left;padding:12px 14px;border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);transition:border-color .15s,background .15s}
+.toolcard:hover{border-color:var(--accent);background:var(--accent-soft)}
+.toolcard .tk{flex:none;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:700;background:var(--accent-soft);color:var(--accent-strong)}
+.toolcard strong{display:block}
+.toolcard span span{display:block;font-size:.88rem;color:var(--muted);margin-top:2px}
+.tag.mom{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.tag.dif{background:transparent;color:var(--muted);border:1px dashed var(--line-strong)}
+.filters2{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.objlist{display:flex;flex-direction:column}
+.obj-body{padding:0 12px 12px;display:flex;flex-direction:column;gap:10px}
+.res-item summary .saved{color:var(--ok);font-weight:600}
 </style>
 </head>
 <body>
@@ -612,6 +626,13 @@ a.btn:hover{color:var(--accent-strong)}
   </section>
 
   <section class="view" id="view-biblioteca" aria-label="Biblioteca de prompts" hidden>
+    <div class="wrap">
+      <section class="panel" aria-labelledby="toolsH">
+        <h2 id="toolsH" class="serif tools-h">Herramientas</h2>
+        <p class="muted">Atajos a las partes del sistema que más se usan y dos analizadores propios.</p>
+        <ul class="toolgrid" id="toolGrid"></ul>
+      </section>
+    </div>
 <div class="wrap">
   <section class="panel finder" aria-labelledby="finderH">
     <div class="finder-head">
@@ -654,6 +675,7 @@ a.btn:hover{color:var(--accent-strong)}
       <button class="btn" id="btnClear" type="button" disabled>Limpiar búsqueda y filtros</button>
     </div>
     <div class="filters" id="filters" role="group" aria-label="Filtrar por categoría"></div>
+    <div class="filters2"><label class="sr" for="fMom">Momento de uso</label><select class="sel" id="fMom"></select><label class="sr" for="fDif">Dificultad</label><select class="sel" id="fDif"></select></div>
     <p class="status" id="status" role="status" aria-live="polite"></p>
   </div>
 </section>
@@ -817,6 +839,24 @@ a.btn:hover{color:var(--accent-strong)}
     <p class="err" id="tkErr" role="alert" hidden></p>
     <div class="row"><button class="link danger" id="tkDel" type="button" hidden>Eliminar acción</button><button class="btn" id="tkCancel" type="button">Cancelar</button><button class="btn primary" type="submit" id="tkSubmit">Añadir acción</button></div>
   </form>
+</dialog>
+
+<dialog id="dlgTool" class="small wide" aria-labelledby="toolTitle">
+  <div class="box" id="toolBox"></div>
+</dialog>
+
+<dialog id="dlgObj" class="small wide" aria-labelledby="objTitle">
+  <div class="box">
+    <h2 id="objTitle" tabindex="-1">Biblioteca de objeciones</h2>
+    <p class="hint">Prepara con tu asistente de IA cómo responder a cada objeción y guarda aquí la respuesta que te convenza. Se guarda en este navegador y sirve para todos tus prospectos.</p>
+    <p class="small-note" id="objCtx"></p>
+    <ul class="objlist" id="objList"></ul>
+    <form class="addrow" id="objAdd" novalidate>
+      <div class="field"><label for="objNew">Añadir otra objeción</label><input id="objNew" type="text" maxlength="80" autocomplete="off" placeholder="Por ejemplo: Es demasiado caro"></div>
+      <button class="btn" type="submit">Añadir</button>
+    </form>
+    <div class="row"><button type="button" class="btn primary" id="objClose">Cerrar</button></div>
+  </div>
 </dialog>
 
 <dialog id="dlgCard" class="small wide" aria-labelledby="cardTitle">
@@ -1453,7 +1493,7 @@ const egOf=e=>e==="Ganado"?"won":TERMINAL.has(e)?"lost":ESTADOS.indexOf(e)>=4?"a
 const CRIT=[["icp","Encaje con el cliente ideal",25],["necesidad","Necesidad potencial",20],["economica","Capacidad económica",15],["acceso","Acceso al decisor",15],["momento","Momento y señales de compra",15],["estrategico","Potencial estratégico",10]];
 
 const BLANKP=()=>({id:uid("p"),created:nowISO(),updated:nowISO(),estado:"Nuevo",afinidad:"",motivo:"",empresa:{},contacto:{},score:{},notas:"",proxima:"",proximaFecha:"",inputs:{},results:{},savedAt:{},done:{},touched:{},used:{}});
-function blank(){return {schema:3,tasks:[],interactions:[],favs:[],custom:{},own:[],used:{},theme:null,route:null,business:{},icp:{},
+function blank(){return {schema:3,tasks:[],interactions:[],objCustom:[],objAnswers:{},toolInputs:{},favs:[],custom:{},own:[],used:{},theme:null,route:null,business:{},icp:{},
   sys:{results:{},savedAt:{},done:{},touched:{}},prospects:[],active:null,ui:{view:"sistema",step:1,variants:{}}}}
 
 function sanCustom(v){
@@ -1493,6 +1533,8 @@ function sanitize2(o){
   s.theme=o.theme==="dark"||o.theme==="light"?o.theme:null;
   s.route=Number.isInteger(o.route)&&o.route>=0&&o.route<ROUTES.length?o.route:null;
   s.business=flat(o.business);s.icp=flat(o.icp);
+  s.objCustom=[...new Set((Array.isArray(o.objCustom)?o.objCustom:[]).filter(x=>typeof x==="string"&&x.trim()).map(x=>x.trim().slice(0,80)))].slice(0,60);
+  s.objAnswers=flat(o.objAnswers,5000);s.toolInputs=sanNested(o.toolInputs,20000);
   const sy=obj(o.sys);s.sys={results:sanNested(sy.results,100000),savedAt:sanNested(sy.savedAt,40),done:bools(sy.done),touched:bools(sy.touched)};
   const seen=new Set();
   s.prospects=(Array.isArray(o.prospects)?o.prospects:[]).slice(0,1000).map(sanP).map(p=>{if(seen.has(p.id))p.id=uid("p");seen.add(p.id);return p});
@@ -2209,6 +2251,7 @@ card.addEventListener("click",e=>{
   else if(act==="newp")openPDialog(null,b);
   else if(act==="newint")openInt(activeP().id,b);
   else if(act==="sched")scheduleSeq(b);
+  else if(act==="objlib")openObj(b);
   else if(act==="gocrm")showView("prospectos",true);
   else if(act==="go2")goStep(2,true);
   else if(act==="investigar"){setActive(b.dataset.id,true);goStep(3,true)}
@@ -2250,7 +2293,7 @@ card.addEventListener("change",e=>{
   const p=pById(s.dataset.aff);if(p){p.afinidad=s.value;p.updated=nowISO();save()}
 });
 
-STEPS[8].after=()=>curVariant(9).id==="seq"?`<section class="sub" aria-labelledby="sqH"><h4 id="sqH">Programar los seguimientos</h4><p class="muted">Crea las cuatro acciones con fecha en Mis próximas acciones, contando desde tu último contacto registrado con este prospecto o, si no hay ninguno, desde hoy.</p><button type="button" class="btn primary" data-act="sched">Programar estos seguimientos</button></section>`:"";
+STEPS[8].after=()=>curVariant(9).id==="obj"?`<section class="sub" aria-labelledby="obH"><h4 id="obH">Tu biblioteca de objeciones</h4><p class="muted">Guarda las respuestas que más te convenzan para reutilizarlas con otros prospectos.</p><button type="button" class="btn" data-act="objlib">Abrir la biblioteca de objeciones</button></section>`:curVariant(9).id==="seq"?`<section class="sub" aria-labelledby="sqH"><h4 id="sqH">Programar los seguimientos</h4><p class="muted">Crea las cuatro acciones con fecha en Mis próximas acciones, contando desde tu último contacto registrado con este prospecto o, si no hay ninguno, desde hoy.</p><button type="button" class="btn primary" data-act="sched">Programar estos seguimientos</button></section>`:"";
 /* ¿Qué tengo que hacer ahora? */
 const WHY={3:"Investiga la empresa antes de contactar.",4:"Identifica a la persona que decide o influye en la compra.",5:"Puntúa la oportunidad para decidir si merece tu tiempo ahora.",6:"Define qué decir, a quién y por qué canal.",7:"Prepara los mensajes de primer contacto.",8:"Prepara la llamada y practícala antes de hacerla.",9:"Anticipa las objeciones y programa los seguimientos.",10:"Prepara la reunión y registra el resultado."};
 const firstOpen=p=>[3,4,5,6,7,8,9,10].find(n=>!p.done[n])||null;
@@ -2363,14 +2406,14 @@ function openCard(id,opener){
   const p=pById(id);if(!p)return;
   cardId=id;if(opener)cardOpener=opener;
   const si=scoreInfo(p),dl=fields=>{const r=fields.map(x=>{const v=(x.path.split(".").slice(1).reduce((o,k)=>o&&o[k],p)||"").trim();return v?`<dt>${esc(x.label)}</dt><dd>${esc(v)}</dd>`:""}).join("");return r?`<dl class="dl">${r}</dl>`:`<p class="muted">Sin datos todavía.</p>`};
-  const res=[3,4,5,6,7,8,9,10].flatMap(n=>stepDef(n).prompts.map(v=>({n,v,t:(p.results[n]||{})[v.id]||"",at:(p.savedAt[n]||{})[v.id]}))).filter(r=>r.t.trim());
+  const res=[3,4,5,6,7,8,9,10].flatMap(n=>stepDef(n).prompts.map(v=>({n,v,t:(p.results[n]||{})[v.id]||"",at:(p.savedAt[n]||{})[v.id]}))).concat(Object.entries(p.results.tool||{}).filter(([k])=>TOOLDEF[k]).map(([k,t])=>({n:0,tool:k,t,at:(p.savedAt.tool||{})[k]}))).filter(r=>r.t.trim());
   $("#cardBox").innerHTML=`<div class="card-head"><div><h2 id="cardTitle">${esc(pname(p))}</h2><p class="hint">${esc([fullName(p),p.contacto.cargo].filter(Boolean).join(", ")||"Sin contacto identificado")}. Creado el ${esc(fmtDate(p.created,false))}.</p></div>
     <div class="pf"><label for="cardEstado">Estado</label><select class="sel" id="cardEstado">${ESTADOS.map(e=>`<option${e===p.estado?" selected":""}>${e}</option>`).join("")}</select></div></div>
     <div class="row start"><button type="button" class="btn primary" id="cardCont">Continuar en Mi sistema</button><button type="button" class="btn" id="cardEdit">Editar datos</button></div>
     <section class="card-sec"><h3>Empresa</h3>${dl(fieldsOfStep(3))}</section>
     <section class="card-sec"><h3>Contacto</h3>${dl(fieldsOfStep(4))}</section>
     <section class="card-sec"><h3>Puntuación</h3>${si.n?`<p><strong>${si.tot}/100</strong>, prioridad ${si.prio}${si.n<6?`. Provisional: ${si.n} de 6 criterios valorados`:""}.</p>`:`<p class="muted">Sin puntuar. Hazlo en el paso 5.</p>`}${dl(fieldsOfStep(5).filter(x=>x.type!=="number"))}</section>
-    <section class="card-sec"><h3>Investigación, estrategia y mensajes guardados</h3>${res.length?res.map((r,i)=>`<details class="res-item"><summary>Paso ${r.n}. ${esc(stepDef(r.n).title)}${stepDef(r.n).prompts.length>1?`: ${esc(r.v.label)}`:""}${r.at?`<small>Guardado el ${esc(fmtDate(r.at))}</small>`:""}</summary><pre class="pv">${esc(r.t)}</pre><div class="pb-actions"><button type="button" class="btn" data-copyres="${i}">Copiar</button></div></details>`).join(""):`<p class="muted">Aún no has guardado respuestas de la IA para este prospecto.</p>`}</section>
+    <section class="card-sec"><h3>Investigación, estrategia, mensajes y análisis guardados</h3>${res.length?res.map((r,i)=>`<details class="res-item"><summary>${r.n?`Paso ${r.n}. ${esc(stepDef(r.n).title)}${stepDef(r.n).prompts.length>1?`: ${esc(r.v.label)}`:""}`:esc(TOOLDEF[r.tool].title)}${r.at?`<small>Guardado el ${esc(fmtDate(r.at))}</small>`:""}</summary><pre class="pv">${esc(r.t)}</pre><div class="pb-actions"><button type="button" class="btn" data-copyres="${i}">Copiar</button></div></details>`).join(""):`<p class="muted">Aún no has guardado respuestas de la IA para este prospecto.</p>`}</section>
     <section class="card-sec"><h3>Historial de interacciones</h3>${(()=>{const l=intsOf(p.id);return l.length?`<ul class="mini-list">${l.map(x=>`<li><span><strong>${dShort(x.fecha)}, ${esc(x.canal)}:</strong> ${esc(x.resultado)}${x.notas?`. ${esc(x.notas)}`:""}</span><button type="button" class="link danger" data-delint="${x.id}">Eliminar<span class="sr"> interacción del ${dShort(x.fecha)}</span></button></li>`).join("")}</ul>`:`<p class="muted">Sin interacciones registradas.</p>`})()}
       <div class="row-btns"><button type="button" class="btn" id="cardInt">Registrar interacción</button></div></section>
     <section class="card-sec"><h3>Acciones pendientes</h3>${(()=>{const l=sortTasks(store.tasks.filter(t=>!t.done&&t.pid===p.id));return l.length?`<ul class="tasks">${l.map(taskRow).join("")}</ul>`:`<p class="muted">Sin acciones pendientes con este prospecto.</p>`})()}
@@ -2665,6 +2708,190 @@ function scheduleSeq(btn){
   toast(n?`${n} seguimientos añadidos a Mis próximas acciones, contando desde el ${dShort(start)}`:"Esos seguimientos ya estaban programados");
 }
 
+/* ================= Fase 3: herramientas y etiquetas de la biblioteca ================= */
+const TAGS={1:["Investigación","Básico"],2:["Investigación","Básico"],3:["Análisis de oportunidades","Intermedio"],4:["Estrategia comercial","Intermedio"],5:["Email","Básico"],6:["Email","Intermedio"],7:["Email","Básico"],8:["Llamadas","Básico"],9:["Llamadas","Intermedio"],10:["Llamadas","Básico"],
+  11:["Identificación de decisores","Básico"],12:["Objeciones","Intermedio"],13:["Seguimientos","Básico"],14:["Identificación de decisores","Avanzado"],15:["LinkedIn","Básico"],16:["Seguimientos","Básico"],17:["Cierre","Intermedio"],18:["Seguimientos","Básico"],19:["Seguimientos","Intermedio"],20:["Email","Intermedio"]};
+const MOMENTOS=["Investigación","Identificación de decisores","Análisis de oportunidades","Estrategia comercial","Email","LinkedIn","Llamadas","Objeciones","Seguimientos","Cierre"];
+const DIFS=["Básico","Intermedio","Avanzado"];
+let fMom="",fDif="";
+const tagsHTML=p=>{const t=TAGS[p.id];return t?`<span class="tag mom">${t[0]}</span><span class="tag dif" data-d="${t[1]}">${t[1]}</span>`:""};
+function initTagFilters(){
+  $("#fMom").innerHTML=`<option value="">Cualquier momento</option>`+MOMENTOS.map(m=>`<option>${m}</option>`).join("");
+  $("#fDif").innerHTML=`<option value="">Cualquier dificultad</option>`+DIFS.map(m=>`<option>${m}</option>`).join("");
+  $("#fMom").addEventListener("change",e=>{fMom=e.target.value;renderGrid()});
+  $("#fDif").addEventListener("change",e=>{fDif=e.target.value;renderGrid()});
+}
+
+/* ---------- Contexto para herramientas ---------- */
+function toolCtx(useP){
+  const out=[`Mi negocio:\n${ctxLines(fieldsOfStep(1)).join("\n")||"- Sin datos todavía."}`];
+  const p=useP&&activeP();
+  if(p){
+    const e=ctxLines(fieldsOfStep(3)),c=ctxLines(fieldsOfStep(4));
+    out.push(`Empresa prospecto:\n${e.join("\n")||"- Sin datos todavía."}`,`Persona de contacto:\n${c.join("\n")||"- Sin datos todavía."}`);
+    const h=intsOf(p.id).slice(0,8);
+    if(h.length)out.push("Historial de contacto (lo registré yo):\n"+h.map(x=>`- ${x.fecha}, ${x.canal}: ${x.resultado}${x.notas?`. ${x.notas}`:""}`).join("\n"));
+    const r=resultsText(6);if(r)out.push(r);
+  }
+  return "CONTEXTO\n\n"+out.join("\n\n");
+}
+const pFor=useP=>{const p=useP&&activeP();return p?{emp:gs("p.empresa.nombre")||"su empresa",con:fullName(p)||"la persona de contacto"}:null};
+
+/* ---------- Herramientas con formulario propio ---------- */
+const TOOLDEF={
+  email:{title:"Analizador de emails",intro:"Pega un email que te haya enviado un prospecto y prepara una respuesta comercial adecuada.",
+    fields:[{k:"email",label:"Email recibido",rows:8},{k:"objetivo",label:"Qué quieres conseguir con tu respuesta",options:["Que lo proponga la IA","Conseguir una reunión","Resolver una duda","Responder a una objeción","Cerrar con educación y dejar la puerta abierta"]},{k:"extra",label:"Contexto adicional (opcional)",rows:3}],
+    build:(v,useP)=>{const x=pFor(useP);return `Actúa como comercial B2B con experiencia. Analiza este email que he recibido ${x?`de ${x.con}, de ${x.emp}`:"de un prospecto"} y prepárame la respuesta.
+
+Email recibido:
+"""
+${v.email||"[Pega aquí el email recibido]"}
+"""
+
+Qué quiero conseguir: ${!v.objetivo||v.objetivo==="Que lo proponga la IA"?"propónmelo tú según el email y el contexto":v.objetivo.toLowerCase()}.${v.extra?`\n\nContexto adicional:\n${v.extra}`:""}
+
+${toolCtx(useP)}
+
+Entrega:
+1. Lectura del email: qué pide o dice, tono, nivel de interés y señales de compra o de rechazo. Separa lo que dice literalmente de tu interpretación.
+2. Objeciones o dudas, explícitas e implícitas.
+3. Qué conviene responder y qué conviene no decir.
+4. Dos respuestas: una breve, de un máximo de 80 palabras, y otra completa, de un máximo de 150. Cada una con una sola llamada a la acción.
+5. Si procede, la pregunta que yo haría para avanzar.
+
+${RULES}
+- No prometas plazos, precios ni resultados que no aparezcan en mi información.`}},
+  comp:{title:"Analizador de competencia",intro:"Compara tu propuesta con las alternativas que tiene el prospecto, a partir de información que puedas verificar.",
+    fields:[{k:"rivales",label:"Competidores o alternativas",rows:3,ph:"Incluye «no hacer nada» o «seguir con hojas de cálculo» si es la alternativa real"},{k:"info",label:"Información verificable que tienes sobre ellos",rows:6,hint:"Webs, precios publicados, opiniones de clientes, notas de reuniones. Con enlace si lo tienes."}],
+    build:(v,useP)=>{const x=pFor(useP);return `Actúa como analista de mercado B2B. Compara mi propuesta con estas alternativas${x?`, pensando en ${x.emp}`:""}.
+
+Competidores o alternativas:
+${v.rivales||"[Escribe aquí los competidores o alternativas]"}
+
+Información verificable que tengo:
+${v.info||"No he aportado información. Si puedes consultar fuentes, cítalas; si no, dilo y no rellenes con suposiciones."}
+
+${toolCtx(useP)}
+
+Entrega:
+1. Tabla comparativa: para cada alternativa, a quién se dirige, propuesta principal, puntos fuertes, puntos débiles y precio si es público. Cada dato con su fuente o marcado como [Hipótesis] o [Desconocido].
+2. Dónde somos claramente mejores, solo con argumentos que yo pueda demostrar.
+3. Dónde estamos igual o peor, y cómo plantearlo con honestidad.
+4. Preguntas para descubrir si el prospecto valora lo que nos diferencia.
+5. Argumentario: 3 mensajes para cuando el prospecto mencione cada alternativa, sin desacreditar a la competencia.
+6. Qué información me falta para completar la comparación y dónde buscarla.
+
+${RULES}
+- No atribuyas a ningún competidor precios, clientes ni defectos que no estén en la información aportada o en una fuente que cites.`}}
+};
+const dlgTool=$("#dlgTool");let toolId=null,toolOpener=null;
+function toolVals(id){return store.toolInputs[id]||(store.toolInputs[id]={})}
+function useP(){const c=$("#toolUseP");return !!(c&&c.checked)}
+function openTool(id,opener){
+  const d=TOOLDEF[id],v=toolVals(id),p=activeP();toolId=id;toolOpener=opener||document.activeElement;
+  $("#toolBox").innerHTML=`<h2 id="toolTitle">${d.title}</h2><p class="hint">${d.intro}</p>
+    ${p?`<label class="check"><input type="checkbox" id="toolUseP" checked> Usar los datos de «${esc(pname(p))}», el prospecto activo</label>`:`<p class="small-note">No hay prospecto activo: el prompt usará solo los datos de tu negocio.</p>`}
+    ${d.fields.map(x=>{const id2="tl-"+x.k,h=x.hint?`<small id="${id2}-h">${esc(x.hint)}</small>`:"";
+      const ctl=x.options?`<select class="sel" id="${id2}" data-tk="${x.k}">${x.options.map(o=>`<option${v[x.k]===o?" selected":""}>${o}</option>`).join("")}</select>`:`<textarea id="${id2}" data-tk="${x.k}" rows="${x.rows}"${x.ph?` placeholder="${esc(x.ph)}"`:""}${x.hint?` aria-describedby="${id2}-h"`:""}></textarea>`;
+      return `<div class="pf"><label for="${id2}">${x.label}</label>${ctl}${h}</div>`}).join("")}
+    <section class="promptbox"><h4>Instrucciones para tu asistente de IA</h4><pre class="pv" id="toolText" tabindex="0" aria-label="Prompt generado"></pre>
+      <div class="pb-actions"><button type="button" class="btn primary" id="toolCopy">Copiar prompt</button><a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" data-topen>Copiar y abrir ChatGPT</a><a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" data-topen>Copiar y abrir Claude</a></div></section>
+    <div class="pf"><label for="toolRes">Respuesta de la IA</label><textarea id="toolRes" rows="7" placeholder="Pega aquí la respuesta de tu asistente de IA."></textarea>
+      <small>${p?"Puedes guardarla en la ficha del prospecto activo.":"Para guardarla necesitas un prospecto activo."}</small></div>
+    <div class="row"><button type="button" class="btn" id="toolSave"${p?"":" disabled"}>Guardar en la ficha</button><button type="button" class="btn primary" id="toolClose">Cerrar</button></div>`;
+  $$("textarea[data-tk]",dlgTool).forEach(t=>t.value=v[t.dataset.tk]||"");
+  $("#toolRes").value=(p&&p.results.tool&&p.results.tool[id])||"";
+  updTool();dlgTool.showModal();$("#toolTitle").focus();
+}
+function updTool(){const v=toolVals(toolId);$("#toolText").textContent=TOOLDEF[toolId].build(v,useP())}
+dlgTool.addEventListener("input",e=>{const k=e.target.dataset.tk;if(k){const v=toolVals(toolId);if(e.target.value.trim())v[k]=e.target.value;else delete v[k];save()}if(e.target.id!=="toolRes")updTool()});
+dlgTool.addEventListener("change",e=>{if(e.target.id==="toolUseP"||e.target.dataset.tk){const k=e.target.dataset.tk;if(k){toolVals(toolId)[k]=e.target.value;save()}updTool()}});
+dlgTool.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.closest("#toolCopy"))copyText(TOOLDEF[toolId].build(toolVals(toolId),useP()),t.closest("#toolCopy"),"Prompt");
+  else if(t.closest("[data-topen]"))copyText(TOOLDEF[toolId].build(toolVals(toolId),useP()),null,"Prompt");
+  else if(t.closest("#toolClose"))dlgTool.close();
+  else if(t.closest("#toolSave")){
+    const p=activeP(),txt=$("#toolRes").value;if(!p)return;
+    p.results.tool=p.results.tool||{};p.savedAt.tool=p.savedAt.tool||{};
+    if(txt.trim()){p.results.tool[toolId]=txt;p.savedAt.tool[toolId]=nowISO()}else{delete p.results.tool[toolId];delete p.savedAt.tool[toolId]}
+    p.updated=nowISO();save();doneFlash(t.closest("#toolSave"));toast(txt.trim()?`Guardado en la ficha de ${pname(p)}`:"Respuesta eliminada de la ficha");
+  }
+});
+dlgTool.addEventListener("close",()=>{if(toolOpener&&toolOpener.isConnected)toolOpener.focus()});
+
+/* ---------- Biblioteca de objeciones ---------- */
+const dlgObj=$("#dlgObj");let objOpener=null;
+const allObj=()=>OBJ.map(o=>o.replace(/\.$/,"")).concat(store.objCustom);
+function objPrompt(o){
+  const p=activeP(),x=p?{emp:gs("p.empresa.nombre")||"su empresa",con:fullName(p)||"la persona de contacto"}:null;
+  return `Actúa como formador de ventas B2B. Prepárame para responder a esta objeción${x?` de ${x.con}, de ${x.emp}`:""}: «${o}».
+
+${toolCtx(!!p)}
+
+Entrega:
+1. Qué puede significar realmente: 2–3 interpretaciones posibles.
+2. Cómo interpretarla: qué señales distinguen cada interpretación.
+3. Qué pregunta haría para averiguarlo.
+4. Respuesta recomendada: 1–3 frases conversacionales y empáticas, y una variante más breve.
+5. Errores que evitar.
+6. Cómo intentar avanzar sin presionar, incluido cuándo aceptar un no y dejar la puerta abierta.
+
+Presenta la objeción como una posibilidad, no como algo que el prospecto haya dicho.
+
+${RULES}
+- No inventes pruebas, clientes ni resultados para responder.`;
+}
+function renderObj(openIdx){
+  const p=activeP(),list=allObj();
+  $("#objCtx").textContent=p?`Los prompts usan los datos de «${pname(p)}», el prospecto activo, y tu negocio.`:"No hay prospecto activo: los prompts usan solo los datos de tu negocio.";
+  $("#objList").innerHTML=list.map((o,i)=>{const a=store.objAnswers[o]||"",own=i>=OBJ.length;return `<li><details class="res-item"${i===openIdx?" open":""}><summary>«${esc(o)}»${a.trim()?'<small class="saved">Respuesta guardada</small>':""}</summary>
+    <div class="obj-body"><div class="pb-actions"><button type="button" class="btn" data-ocopy="${i}">Copiar prompt para prepararla</button><a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" data-oopen="${i}">Copiar y abrir ChatGPT</a></div>
+    <div class="pf"><label for="oa-${i}">Mi respuesta</label><textarea id="oa-${i}" rows="4" data-oans="${i}" placeholder="Pega o escribe la respuesta que vas a usar."></textarea></div>
+    <div class="pb-actions"><button type="button" class="btn" data-ocopyans="${i}">Copiar mi respuesta</button>${own?`<button type="button" class="link danger" data-odel="${i}">Eliminar objeción</button>`:""}</div></div></details></li>`}).join("");
+  list.forEach((o,i)=>{$(`#oa-${i}`).value=store.objAnswers[o]||""});
+}
+function openObj(opener){objOpener=opener||document.activeElement;renderObj(-1);$("#objNew").value="";dlgObj.showModal();$("#objTitle").focus()}
+dlgObj.addEventListener("input",e=>{
+  const i=e.target.dataset.oans;if(i===undefined)return;
+  const o=allObj()[+i];if(e.target.value.trim())store.objAnswers[o]=e.target.value;else delete store.objAnswers[o];save();
+  const s=e.target.closest("details").querySelector("summary"),has=!!e.target.value.trim(),tag=$(".saved",s);
+  if(has&&!tag)s.insertAdjacentHTML("beforeend",'<small class="saved">Respuesta guardada</small>');else if(!has&&tag)tag.remove();
+});
+dlgObj.addEventListener("click",e=>{
+  const q=s=>e.target.closest(s),list=allObj();let b;
+  if(b=q("[data-ocopy]"))copyText(objPrompt(list[+b.dataset.ocopy]),b,"Prompt");
+  else if(b=q("[data-oopen]"))copyText(objPrompt(list[+b.dataset.oopen]),null,"Prompt");
+  else if(b=q("[data-ocopyans]")){const t=store.objAnswers[list[+b.dataset.ocopyans]]||"";if(t.trim())copyText(t,b,"Respuesta");else toast("Aún no has guardado una respuesta para esta objeción")}
+  else if(b=q("[data-odel]")){const o=list[+b.dataset.odel];ask("¿Eliminar esta objeción?",`«${o}» y tu respuesta guardada desaparecerán de la biblioteca.`,"Sí, eliminar",()=>{store.objCustom=store.objCustom.filter(x=>x!==o);delete store.objAnswers[o];save();renderObj(-1);$("#objNew").focus()})}
+  else if(q("#objClose"))dlgObj.close();
+});
+$("#objAdd").addEventListener("submit",e=>{
+  e.preventDefault();const v=$("#objNew").value.trim().replace(/^[«"]|[»"]$/g,"").replace(/\.$/,"");
+  if(!v)return $("#objNew").focus();
+  if(allObj().some(o=>norm(o)===norm(v))){toast("Esa objeción ya está en la biblioteca");return}
+  store.objCustom.push(v.slice(0,80));save();renderObj(allObj().length-1);toast("Objeción añadida");
+  const d=$("#objList li:last-child summary");if(d)d.focus();
+});
+dlgObj.addEventListener("close",()=>{if(objOpener&&objOpener.isConnected)objOpener.focus()});
+
+/* ---------- Panel de herramientas ---------- */
+const TOOLS=[
+  ["A","Generador de propuesta de valor","Explica qué vendes, a quién y qué problema resuelves.",()=>{showView("sistema",true);goStep(1,true)}],
+  ["B","Generador de cliente ideal","Define segmentos, criterios y señales de oportunidad.",()=>{showView("sistema",true);goStep(2,true)}],
+  ["C","Analizador de emails","Pega un email recibido y prepara la respuesta.",b=>openTool("email",b)],
+  ["D","Entrenador de ventas","Practica una llamada con la IA en el papel del cliente.",()=>{store.ui.variants[8]="practica";showView("sistema",true);goStep(8,true)}],
+  ["E","Secuencias multicanal","Combina email, LinkedIn y llamadas con fechas.",()=>{store.ui.variants[9]="seq";showView("sistema",true);goStep(9,true)}],
+  ["F","Analizador de competencia","Compara tu propuesta con las alternativas del prospecto.",b=>openTool("comp",b)],
+  ["G","Preparador de reuniones","Agenda, preguntas y argumentos antes de reunirte.",()=>{store.ui.variants[10]="reu";showView("sistema",true);goStep(10,true)}],
+  ["H","Evaluador de resultados","Analiza tu actividad registrada y sugiere mejoras.",()=>{showView("panel",true);const r=$("#rsH");if(r)r.scrollIntoView({block:"start"})}],
+  ["I","Biblioteca de objeciones","Prepara y guarda tus respuestas a las objeciones habituales.",b=>openObj(b)]];
+function renderTools(){
+  $("#toolGrid").innerHTML=TOOLS.map(([k,t,d],i)=>`<li><button type="button" class="toolcard" data-tool="${i}"><span class="tk" aria-hidden="true">${k}</span><span><strong>${t}</strong><span>${d}</span></span></button></li>`).join("");
+}
+$("#toolGrid").addEventListener("click",e=>{const b=e.target.closest("[data-tool]");if(b)TOOLS[+b.dataset.tool][3](b)});
+initTagFilters();renderTools();
+
 const ROUTES=[
   {name:"Primer email",desc:"De la investigación a un email revisado",ids:[1,2,3,4,5,20]},
   {name:"Llamada en frío",desc:"Del perfil al guion y al registro",ids:[1,2,4,8,10,18]},
@@ -2733,7 +2960,7 @@ function fill(p,text,html){
 }
 const hayCache=new WeakMap();
 function hay(p){
-  if(!hayCache.has(p))hayCache.set(p,norm([p.title,p.when,CATS[p.cat],p.text||"",...(p.options||[]).map(o=>o.name+" "+o.text),p.options?RULE7:""].join(" \n ")));
+  if(!hayCache.has(p))hayCache.set(p,norm([p.title,p.when,CATS[p.cat],p.text||"",...(p.options||[]).map(o=>o.name+" "+o.text),p.options?RULE7:"",...(TAGS[p.id]||[])].join(" \n ")));
   return hayCache.get(p);
 }
 
@@ -2773,6 +3000,7 @@ function visible(){
     if(filter==="favs"&&!isFav(p))return false;
     if(filter==="own"&&!isOwn(p))return false;
     if(!["todos","favs","own"].includes(filter)&&p.cat!==filter)return false;
+    const tg=TAGS[p.id]||[];if(fMom&&tg[0]!==fMom||fDif&&tg[1]!==fDif)return false;
     const h=hay(p);
     return tokens.every(t=>h.includes(t));
   });
@@ -2782,7 +3010,7 @@ function renderGrid(){
   $("#grid").innerHTML=list.map((p,i)=>{
     const on=isFav(p),n=numOf(p);
     return `<li><article class="card" data-cat="${p.cat}" style="animation-delay:${Math.min(i*18,180)}ms" aria-labelledby="t${p.id}">
-      <div class="card-top"><span class="num" aria-hidden="true">${pad(n)}</span><span class="pill">${CATS[p.cat]}</span>${isOwn(p)?'<span class="tag">Propio</span>':""}<span class="tag used" data-used="${p.id}"${isUsed(p)?"":" hidden"}>Usado</span>
+      <div class="card-top"><span class="num" aria-hidden="true">${pad(n)}</span><span class="pill">${CATS[p.cat]}</span>${tagsHTML(p)}${isOwn(p)?'<span class="tag">Propio</span>':""}<span class="tag used" data-used="${p.id}"${isUsed(p)?"":" hidden"}>Usado</span>
       <button type="button" class="star" data-fav="${p.id}" aria-pressed="${on}" aria-label="${esc(starLabel(p,on))}">${STAR}</button></div>
       <h3 id="t${p.id}"><span class="sr">Prompt ${n}: </span>${esc(p.title)}</h3>
       <p class="when">${esc(p.when)}</p>
@@ -2803,10 +3031,10 @@ function renderGrid(){
     }
   }
   $("#status").textContent=none?"0 prompts encontrados.":`Mostrando ${list.length} de ${all().length} prompts.`;
-  $("#btnClear").disabled=!(filter!=="todos"||query!=="");
+  $("#btnClear").disabled=!(filter!=="todos"||query!==""||fMom||fDif);
 }
 function setFilter(id){filter=id;renderFilters();renderGrid()}
-function clearAll(){query="";$("#q").value="";setFilter("todos");$("#q").focus()}
+function clearAll(){query="";$("#q").value="";fMom="";fDif="";$("#fMom").value="";$("#fDif").value="";setFilter("todos");$("#q").focus()}
 
 
 function toggleFav(id,btn){
