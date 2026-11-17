@@ -554,6 +554,11 @@ ol.glist{list-style:decimal}
 .tour .row-btns .link{margin-right:auto}
 .tour-hl{outline:3px solid var(--accent)!important;outline-offset:3px;position:relative;z-index:7;border-radius:10px}
 @media (max-width:1360px){.active-p label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}#selProspect{width:220px}}
+.gnav{scroll-margin-top:80px}
+.gnav .chip b{background:transparent;padding:0;min-width:0}
+.gnav .chip[aria-pressed="true"] b{background:transparent;color:inherit}
+.gpager{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+@media (max-width:520px){.gpager .btn{flex:1 1 100%}}
 </style>
 </head>
 <body>
@@ -3485,11 +3490,19 @@ const FAQ=[
   ["¿Necesito una cuenta o pagar algo?","Esta web no pide cuenta ni pago. Tu asistente de IA puede tener su propio plan gratuito o de pago.",""]
 ];
 
+const GSECS=[["g-empieza","Empieza en 5 minutos"],["g-como","Cómo funciona"],["g-benef","Beneficios"],["g-nohace","Lo que no hace"],["g-priv","Privacidad"],["g-glos","Glosario"],["g-faq","Preguntas frecuentes"]];
+let gSec="g-empieza";
+function showGSec(id,focus){
+  gSec=id;
+  GSECS.forEach(([i])=>{const s=$("#"+i);if(s)s.hidden=i!==id});
+  $$("[data-gsec]",$("#gnav")).forEach(b=>b.setAttribute("aria-pressed",b.dataset.gsec===id));
+  if(focus){const nav=$("#gnav");if(nav.getBoundingClientRect().top<0)nav.scrollIntoView({block:"start"});const h=$("#"+id+"-h");h.tabIndex=-1;h.focus({preventScroll:true})}
+}
 function guideHTML(){
   const hasDemo=store.prospects.some(p=>p.demo);
   return `<div class="sys-head"><div><h2 id="guiaH">Guía de uso</h2><p class="muted">Todo lo que necesitas para sacarle partido a la plataforma, explicado sin tecnicismos.</p></div>
     <div class="row-btns"><button type="button" class="btn" id="btnTour">Repetir la visita guiada</button><button type="button" class="btn primary" data-go="demo" id="btnDemo">${hasDemo?"Quitar el ejemplo":"Cargar un ejemplo para practicar"}</button></div></div>
-  <nav class="gnav" aria-label="Apartados de la guía">${[["g-empieza","Empieza en 5 minutos"],["g-como","Cómo funciona"],["g-benef","Beneficios"],["g-nohace","Lo que no hace"],["g-priv","Privacidad"],["g-glos","Glosario"],["g-faq","Preguntas frecuentes"]].map(([i,l])=>`<a class="chip" href="#${i}" data-anchor="${i}">${l}</a>`).join("")}</nav>
+  <nav class="gnav" id="gnav" aria-label="Apartados de la guía">${GSECS.map(([i,l],n)=>`<button type="button" class="chip" data-gsec="${i}" aria-pressed="${i===gSec}"><b>${n+1}</b> ${l}</button>`).join("")}</nav>
 
   <section class="panel gsec" id="g-empieza" aria-labelledby="g-empieza-h"><h3 id="g-empieza-h">Empieza en 5 minutos</h3>
     <ol class="gsteps">
@@ -3584,18 +3597,21 @@ function renderFaq(){
   $("#faqStatus").textContent=l.length?(q?`${l.length} preguntas encontradas.`:""):`Ninguna pregunta coincide con «${$("#faqQ").value.trim()}». Prueba con otra palabra o consulta el glosario.`;
 }
 function renderGuide(){
-  $("#guideBody").innerHTML=guideHTML();renderGlos();renderFaq();
+  $("#guideBody").innerHTML=guideHTML();
+  GSECS.forEach(([i],n)=>{const p=GSECS[n-1],x=GSECS[n+1];$("#"+i).insertAdjacentHTML("beforeend",`<nav class="gpager" aria-label="Seguir leyendo">${p?`<button type="button" class="btn" data-gsec="${p[0]}">Anterior: ${p[1]}</button>`:"<span></span>"}${x?`<button type="button" class="btn primary" data-gsec="${x[0]}">Siguiente: ${x[1]}</button>`:""}</nav>`)});
+  showGSec(gSec,false);renderGlos();renderFaq();
   $("#glosQ").addEventListener("input",renderGlos);$("#faqQ").addEventListener("input",renderFaq);
 }
 $("#guideBody").addEventListener("click",e=>{
-  const g=e.target.closest("[data-go]"),a=e.target.closest("[data-anchor]");
+  const g=e.target.closest("[data-go]"),a=e.target.closest("[data-gsec]");
   if(g){GO[g.dataset.go][1](g)}
-  else if(a){e.preventDefault();const t=$("#"+a.dataset.anchor);t.scrollIntoView({block:"start"});const h=$("h3",t);h.tabIndex=-1;h.focus({preventScroll:true})}
+  else if(a){showGSec(a.dataset.gsec,true)}
   else if(e.target.closest("#btnTour")){startTour(true)}
 });
+$("#guideBody").addEventListener("toggle",e=>{const d=e.target;if(d.classList&&d.classList.contains("gdet")&&d.open)$$(".gdet",d.parentElement).forEach(x=>{if(x!==d)x.open=false})},true);
 function openGuideStep(n){
   showView("guia",true);
-  const d=$("#g-recorrido");d.open=true;
+  showGSec("g-como",false);$$("#g-como .gdet").forEach(x=>x.open=false);const d=$("#g-recorrido");d.open=true;
   const li=$("#gp-"+n);li.classList.add("flash");li.scrollIntoView({block:"center"});li.focus({preventScroll:true});
   setTimeout(()=>li.classList.remove("flash"),1600);
 }
